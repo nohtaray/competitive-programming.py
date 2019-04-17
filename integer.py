@@ -7,7 +7,7 @@ def get_divisors(n):
     """
     n の約数をリストで返す
     :param int n:
-    :return:
+    :rtype: list of int
     """
     ret = []
     for i in range(1, int(math.sqrt(n)) + 1):
@@ -22,7 +22,7 @@ def get_factors(n):
     """
     素因数分解
     :param int n:
-    :type: list of int
+    :rtype: list of int
     """
     if n <= 1:
         return []
