@@ -1,4 +1,6 @@
 import math
+from functools import reduce
+from operator import mul
 
 
 def get_divisors(n):
@@ -31,3 +33,17 @@ def get_factors(n):
         else:
             i += 1
     return ret
+
+
+def comb(n, r):
+    """
+    scipy.misc.comb または scipy.special.comb と同じ
+    組み合わせの数 nCr
+    :param int n:
+    :param int r:
+    :rtype: int
+    """
+    r = min(n - r, r)
+    if r == 0:
+        return 1
+    return reduce(mul, range(n, n - r, -1)) // reduce(mul, range(r, 0, -1))
