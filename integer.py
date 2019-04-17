@@ -24,14 +24,21 @@ def get_factors(n):
     :param int n:
     :type: list of int
     """
+    if n <= 1:
+        return []
+
     ret = []
-    i = 2
-    while 2 <= i <= n:
+    while n > 2 and n % 2 == 0:
+        ret.append(2)
+        n //= 2
+    i = 3
+    while i <= math.sqrt(n):
         if n % i == 0:
             ret.append(i)
             n //= i
         else:
-            i += 1
+            i += 2
+    ret.append(n)
     return ret
 
 
