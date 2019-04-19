@@ -38,6 +38,7 @@ class BinaryIndexedTree:
 
 def count_inversions(li, max=None):
     """
+    遅いので制限時間シビアなときは PyPy 推奨
     リストから転倒数 (li[i] > li[j] (i < j) となる (i, j) の組み合わせ数) を返す
     バブルソートするときに反転する必要がある数。
     :param numpy.ndarray | list of int li:
