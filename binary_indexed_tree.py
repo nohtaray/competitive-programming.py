@@ -43,6 +43,8 @@ def count_inversions(li, max=None):
     :param numpy.ndarray | list of int li:
             すべての要素が 0 以上の int である配列。
             BIT を使うので、マイナスを含んだり最大値が大きい場合は np.argsort の結果を指定
+            ただしリストに重複を含む場合は np.argsort は unstable なので別の方法使うこと
+            https://docs.scipy.org/doc/numpy/reference/generated/numpy.sort.html
     :param int max: li の最大値。わかる場合は指定
     :rtype: int
     """
