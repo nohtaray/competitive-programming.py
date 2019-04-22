@@ -2,6 +2,32 @@ import functools
 
 import os
 
+INF = float('inf')
+
+
+def inp():
+    return int(input())
+
+
+def inpf():
+    return float(input())
+
+
+def inps():
+    return input()
+
+
+def inl():
+    return list(map(int, input().split()))
+
+
+def inlf():
+    return list(map(float, input().split()))
+
+
+def inls():
+    return input().split()
+
 
 def debug(fn):
     if not os.getenv('LOCAL'):
@@ -21,12 +47,3 @@ def debug(fn):
         return ret
 
     return wrapper
-
-
-if __name__ == '__main__':
-    @debug
-    def some_function(a: int, b: int, c: int = 0):
-        return a * b + c
-
-
-    print(some_function(5, b=3, c=1))
