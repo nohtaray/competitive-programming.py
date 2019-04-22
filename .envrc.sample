@@ -1,0 +1,3 @@
+LOCAL=1
+export LOCAL
+
