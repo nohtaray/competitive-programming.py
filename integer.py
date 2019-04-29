@@ -50,7 +50,18 @@ def comb(n, r):
     :param int r:
     :rtype: int
     """
+    assert n >= r
     r = min(n - r, r)
     if r == 0:
         return 1
     return reduce(mul, range(n, n - r, -1)) // reduce(mul, range(r, 0, -1))
+
+
+def comb_rep(n, r):
+    """
+    重複組み合わせの総数 nHr
+    :param int n:
+    :param int r:
+    :return:
+    """
+    return comb(n + r - 1, r)
