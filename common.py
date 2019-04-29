@@ -1,49 +1,23 @@
+from collections import Counter, deque
+from fractions import gcd
+from functools import lru_cache
+from functools import reduce
 import functools
+import heapq
+import itertools
+import math
+import numpy as np
+import sys
 
-import os
-
+sys.setrecursionlimit(10000)
 INF = float('inf')
 
-
-def inp():
-    return int(input())
-
-
-def inpf():
-    return float(input())
-
-
-def inps():
-    return input()
-
-
-def inl():
-    return list(map(int, input().split()))
-
-
-def inlf():
-    return list(map(float, input().split()))
-
-
-def inls():
-    return input().split()
-
-
-def debug(fn):
-    if not os.getenv('LOCAL'):
-        return fn
-
-    @functools.wraps(fn)
-    def wrapper(*args, **kwargs):
-        print('DEBUG: {}({}) -> '.format(
-            fn.__name__,
-            ', '.join(
-                list(map(str, args)) +
-                ['{}={}'.format(k, str(v)) for k, v in kwargs.items()]
-            )
-        ), end='')
-        ret = fn(*args, **kwargs)
-        print(ret)
-        return ret
-
-    return wrapper
+I = lambda: int(input())
+IF = lambda: float(input())
+IS = lambda: input()
+IL = lambda: list(map(int, input().split()))
+ILF = lambda: list(map(float, input().split()))
+ILS = lambda: input().split()
+Yesif = lambda cond: print('Yes' if cond else 'No')
+YESIF = lambda cond: print('YES' if cond else 'NO')
+yesif = lambda cond: print('yes' if cond else 'no')
