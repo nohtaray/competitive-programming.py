@@ -1,5 +1,8 @@
 class UnionFind:
     def __init__(self, nodes):
+        """
+        :param collections.Iterable nodes:
+        """
         self._parents = {k: k for k in nodes}
         self._ranks = {k: 0 for k in nodes}
         self._sizes = {k: 1 for k in nodes}
