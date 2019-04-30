@@ -7,6 +7,7 @@ import heapq
 import itertools
 import math
 import numpy as np
+import re
 import sys
 
 sys.setrecursionlimit(10000)
