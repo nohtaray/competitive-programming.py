@@ -65,3 +65,33 @@ def comb_rep(n, r):
     :return:
     """
     return comb(n + r - 1, r)
+
+
+def get_primes(max=None, count=None):
+    """
+    素数列挙
+    昇順にソートされています
+    https://qiita.com/Ishotihadus/items/73e107271275611f05f2
+    :param int max:
+    :param int count:
+    :return:
+    """
+    assert max or count
+    if count:
+        raise NotImplementedError()
+    if max <= 1:
+        return []
+
+    primes = [2]
+    sieve = [False for _ in range(max + 1)]
+    p = 3
+    while p <= max:
+        primes.append(p)
+        sieve[p] = True
+        if p <= math.sqrt(max):
+            for i in range(p * (p | 1), max + 1, p * 2):
+                sieve[i] = True
+        while p <= max and sieve[p]:
+            p += 2
+
+    return primes
