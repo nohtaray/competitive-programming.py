@@ -7,6 +7,7 @@ class SegmentTree:
         """
         :param int size:
         :param callable fn: 区間に適用する関数。引数を 2 つ取る。min, max, operator.xor など
+        :param default:
         """
         # size 以上である最小の 2 冪
         n = 1

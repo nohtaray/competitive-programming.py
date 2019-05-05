@@ -1,5 +1,8 @@
 def cummax(it, first=-float('inf')):
     """
+    np.maximum.accumulate(arr) でもよさそう
+    https://stackoverflow.com/questions/33569668/numpy-max-vs-amax-vs-maximum
+
     累積 max
     :param collections.Iterable it:
     :param float first:
