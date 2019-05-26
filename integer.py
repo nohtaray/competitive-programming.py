@@ -1,6 +1,4 @@
 import math
-from functools import reduce
-from operator import mul
 
 
 def get_divisors(n):
@@ -42,29 +40,55 @@ def get_factors(n):
     return ret
 
 
-def comb(n, r):
+def div_mod(a, b, mod):
+    """
+    (a // b) % mod
+    mod は 3 以上の素数を指定
+    フェルマーの小定理より mod p の世界で b^(p-1) は必ず 1 になるので
+    b の逆元 (b と掛けると 1 になる数) は b^(p-2)
+    :param int a:
+    :param int b:
+    :param int mod:
+    :return:
+    """
+    return a * pow(b, mod - 2, mod)
+
+
+def ncr(n, r, mod=None):
     """
     scipy.misc.comb または scipy.special.comb と同じ
     組み合わせの数 nCr
     :param int n:
     :param int r:
+    :param int mod: 3 以上の素数であること
     :rtype: int
     """
     assert n >= r
-    r = min(n - r, r)
-    if r == 0:
-        return 1
-    return reduce(mul, range(n, n - r, -1)) // reduce(mul, range(r, 0, -1))
+
+    def inv(a):
+        """
+        a の逆元
+        :param a:
+        :return:
+        """
+        return pow(a, mod - 2, mod)
+
+    # 何度も呼ぶ場合は最大の n 以下の階乗を事前に計算しておくといい
+    if mod:
+        return math.factorial(n) * inv(math.factorial(r)) * inv(math.factorial(n - r)) % mod
+    else:
+        return math.factorial(n) // math.factorial(r) // math.factorial(n - r)
 
 
-def comb_rep(n, r):
+def nhr(n, r, mod=None):
     """
     重複組み合わせの総数 nHr
     :param int n:
     :param int r:
+    :param int mod:
     :return:
     """
-    return comb(n + r - 1, r)
+    return ncr(n + r - 1, r, mod)
 
 
 def get_primes(max=None, count=None):
