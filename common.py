@@ -1,3 +1,4 @@
+import bisect
 from collections import Counter, deque
 from fractions import gcd
 from functools import lru_cache
