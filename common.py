@@ -11,5 +11,7 @@ import numpy as np
 import re
 import sys
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(100000)
 INF = float('inf')
+
+
