@@ -1,4 +1,5 @@
 import bisect
+import os
 from collections import Counter, deque
 from fractions import gcd
 from functools import lru_cache
@@ -11,7 +12,10 @@ import numpy as np
 import re
 import sys
 
-sys.setrecursionlimit(100000)
+if os.getenv('LOCAL'):
+    sys.stdin = open('_in.txt', 'r')
+
+sys.setrecursionlimit(2147483647)
 INF = float('inf')
 
 
