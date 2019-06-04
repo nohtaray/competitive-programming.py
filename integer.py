@@ -54,6 +54,16 @@ def div_mod(a, b, mod):
     return a * pow(b, mod - 2, mod)
 
 
+def mod_inv(a, mod):
+    """
+    a の逆元
+    :param int a:
+    :param int mod:
+    :return:
+    """
+    return pow(a, mod - 2, mod)
+
+
 def ncr(n, r, mod=None):
     """
     scipy.misc.comb または scipy.special.comb と同じ
@@ -63,19 +73,12 @@ def ncr(n, r, mod=None):
     :param int mod: 3 以上の素数であること
     :rtype: int
     """
-    assert n >= r
-
-    def inv(a):
-        """
-        a の逆元
-        :param a:
-        :return:
-        """
-        return pow(a, mod - 2, mod)
+    if n < r:
+        return 0
 
     # 何度も呼ぶ場合は最大の n 以下の階乗を事前に計算しておくといい
     if mod:
-        return math.factorial(n) * inv(math.factorial(r)) * inv(math.factorial(n - r)) % mod
+        return math.factorial(n) * mod_inv(math.factorial(r), mod) * mod_inv(math.factorial(n - r), mod) % mod
     else:
         return math.factorial(n) // math.factorial(r) // math.factorial(n - r)
 
