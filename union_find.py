@@ -152,10 +152,10 @@ class WeightedUnionFind:
         """
         if self.find(x) == self.find(y):
             return self._weights[y] - self._weights[x]
-        return float('inf')
+        return float("inf")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     uf = UnionFind(nodes=[i for i in range(10)])
 
     assert uf.find(0) == 0
@@ -171,8 +171,8 @@ if __name__ == '__main__':
     assert uf.size(7) == uf.size(8) == 2
     assert uf.size(5) == 1
 
-    uf2 = UnionFind(nodes=['a', 'b', 'c', 'd', 'e'])
-    uf2.unite('a', 'e')
-    uf2.unite('c', 'e')
-    assert uf2.find('a') == uf2.find('c')
-    assert uf2.find('b') != uf2.find('e')
+    uf2 = UnionFind(nodes=["a", "b", "c", "d", "e"])
+    uf2.unite("a", "e")
+    uf2.unite("c", "e")
+    assert uf2.find("a") == uf2.find("c")
+    assert uf2.find("b") != uf2.find("e")

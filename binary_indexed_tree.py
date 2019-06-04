@@ -59,7 +59,7 @@ def count_inversions(li, max=None):
     return ret
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # https://atcoder.jp/contests/chokudai_s001/tasks/chokudai_S001_j
     _ = int(input())
     li = list(map(int, input().split()))

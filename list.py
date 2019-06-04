@@ -32,7 +32,7 @@ def cumsum(it):
     return list(itertools.accumulate(it, operator.add))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     li = [3, 1, 4, 1, 5, 9, 2, 6]
     assert cummax(li) == [3, 3, 4, 4, 5, 9, 9, 9]
     assert cummin(li) == [3, 1, 1, 1, 1, 1, 1, 1]

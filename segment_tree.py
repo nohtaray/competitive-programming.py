@@ -72,7 +72,7 @@ class SegmentTree:
         return self._size
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     st = SegmentTree(size=4, fn=operator.add, default=0)
     st.add(1, 1)
     st.add(2, 2)

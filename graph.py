@@ -40,7 +40,7 @@ def dijkstra(graph, start):
     :param int start:
     :return:
     """
-    dist = [float('inf') for _ in range(len(graph))]
+    dist = [float("inf") for _ in range(len(graph))]
     dist[start] = 0
     heap = []
     heapq.heappush(heap, (0, start))

@@ -78,7 +78,12 @@ def ncr(n, r, mod=None):
 
     # 何度も呼ぶ場合は最大の n 以下の階乗を事前に計算しておくといい
     if mod:
-        return math.factorial(n) * mod_inv(math.factorial(r), mod) * mod_inv(math.factorial(n - r), mod) % mod
+        return (
+            math.factorial(n)
+            * mod_inv(math.factorial(r), mod)
+            * mod_inv(math.factorial(n - r), mod)
+            % mod
+        )
     else:
         return math.factorial(n) // math.factorial(r) // math.factorial(n - r)
 

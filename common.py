@@ -12,10 +12,8 @@ import numpy as np
 import re
 import sys
 
-if os.getenv('LOCAL'):
-    sys.stdin = open('_in.txt', 'r')
+if os.getenv("LOCAL"):
+    sys.stdin = open("_in.txt", "r")
 
 sys.setrecursionlimit(2147483647)
-INF = float('inf')
-
-
+INF = float("inf")
