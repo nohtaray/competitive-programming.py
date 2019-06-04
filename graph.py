@@ -29,6 +29,8 @@ def johnson(*args, **kwargs):
 
 def dijkstra(graph, start):
     """
+    TODO: start 指定しなかったら全部の距離を知りたい
+
     マイナスの辺があっちゃダメ
     scipy.sparse.csgraph.dijkstra は内部で使われてるフィボナッチヒープが一部のケースでめっちゃ遅いのであんまり使わないほうがよさげ
     https://atcoder.jp/contests/soundhound2018-summer-qual/submissions/5311823
