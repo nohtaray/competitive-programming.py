@@ -80,9 +80,9 @@ def get_ncrs(n, mod):
     return ret
 
 
-def cumpower(x, n, mod=None):
+def get_powers(x, n, mod=None):
     """
-    累積累乗 [x^0, x^1, x^2, ..., x^(n-1)]
+    x の累積積 [x^0, x^1, x^2, ..., x^(n-1)]
     :param x:
     :param int n:
     :param int mod:
