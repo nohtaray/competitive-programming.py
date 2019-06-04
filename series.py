@@ -1,3 +1,6 @@
+import itertools
+
+
 def triangle(n):
     """
     n 番目の三角数
@@ -75,3 +78,19 @@ def get_ncrs(n, mod):
         ncr = ((ncr * (n - i + 1) % mod) * invs[i]) % mod
         ret.append(ncr)
     return ret
+
+
+def cumpower(x, n, mod=None):
+    """
+    累積累乗 [x^0, x^1, x^2, ..., x^(n-1)]
+    :param x:
+    :param int n:
+    :param int mod:
+    """
+    if n <= 0:
+        return []
+
+    if mod is not None:
+        return list(itertools.accumulate([1] * n, lambda p, _: p * x % mod))
+    else:
+        return list(itertools.accumulate([1] * n, lambda p, _: p * x))
