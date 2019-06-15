@@ -10,6 +10,7 @@ import itertools
 import math
 import numpy as np
 import re
+import string
 import sys
 
 if os.getenv("LOCAL"):

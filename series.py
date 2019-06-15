@@ -27,7 +27,7 @@ def triangular_pyramid(n):
     return n * (n + 1) * (n + 2) // 6
 
 
-def factorials(max, mod=None):
+def get_factorials(max, mod=None):
     """
     階乗 0!, 1!, 2!, ..., max!
     :param int max:
