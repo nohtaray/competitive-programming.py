@@ -4,7 +4,7 @@ class BinaryIndexedTree:
         """
         :param int size:
         """
-        self._bit = [0 for _ in range(size)]
+        self._bit = [0] * size
         self._size = size
 
     def add(self, i, w):
@@ -16,6 +16,7 @@ class BinaryIndexedTree:
         """
         x = i + 1
         while x <= self._size:
+            # FIXME: - 1 してるから定数倍遅くなってたりとかする？
             self._bit[x - 1] += w
             x += x & -x
 
@@ -36,6 +37,23 @@ class BinaryIndexedTree:
         return self._size
 
 
+def compress(li):
+    """
+    大小関係を保ったまま 1 以上の数値に圧縮する。
+    scipy.stats.rankdata に近い感じ
+    :param list li:
+    :rtype: list of int
+    """
+    ret = [0] * len(li)
+    rank = 0
+    prev = None
+    for a, i in sorted([(a, i) for i, a in enumerate(li)]):
+        if a != prev:
+            rank += 1
+        ret[i] = rank
+    return ret
+
+
 def count_inversions(li, max=None):
     """
     遅いので制限時間シビアなときは PyPy 推奨
@@ -43,8 +61,9 @@ def count_inversions(li, max=None):
     バブルソートするときに反転する必要がある数。
     :param numpy.ndarray | list of int li:
             すべての要素が 0 以上の int である配列。
-            BIT を使うので、マイナスを含んだり最大値が大きい場合は np.argsort の結果を指定
-            ただしリストに重複を含む場合は np.argsort は unstable なので別の方法使うこと
+            BIT を使うので、マイナスを含んだり最大値が大きい場合は↑の compress か
+            np.argsort か scipy.stats.rankdata を使う。全部 O(logN) だとおもう
+            リストに重複を含む場合は np.argsort は unstable なのでつかわない。
             https://docs.scipy.org/doc/numpy/reference/generated/numpy.sort.html
     :param int max: li の最大値。わかる場合は指定
     :rtype: int
