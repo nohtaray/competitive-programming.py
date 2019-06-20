@@ -9,6 +9,9 @@ def ModInt(mod):
             else:
                 return _ModInt(self.value + other)
 
+        def __radd__(self, other):
+            return self.__add__(other)
+
         def __mul__(self, other):
             if isinstance(other, _ModInt):
                 return _ModInt(self.value * other.value)
@@ -29,3 +32,4 @@ if __name__ == '__main__':
     MI7 = ModInt(mod=7)
     assert str(MI7(1) + MI7(8)) == '2'
     assert str(MI7(1) + 8) == '2'
+    assert str(8 + MI7(1)) == '2'
