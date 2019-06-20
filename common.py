@@ -1,17 +1,16 @@
 import bisect
-import os
-from collections import Counter, deque
-from fractions import gcd
-from functools import lru_cache
-from functools import reduce
-import functools
 import heapq
 import itertools
 import math
-import numpy as np
+import os
 import re
 import string
 import sys
+from collections import Counter, deque, defaultdict
+from fractions import gcd
+from functools import lru_cache, reduce
+
+import numpy as np
 
 if os.getenv("LOCAL"):
     sys.stdin = open("_in.txt", "r")
