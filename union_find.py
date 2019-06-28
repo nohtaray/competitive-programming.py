@@ -24,8 +24,8 @@ class UnionFind:
         :param y:
         :return:
         """
-        x = self.find(x)
-        y = self.find(y)
+        x = self.root(x)
+        y = self.root(y)
         if x == y:
             return
 
@@ -41,7 +41,7 @@ class UnionFind:
             if self._ranks[x] == self._ranks[y]:
                 self._ranks[y] += 1
 
-    def find(self, x):
+    def root(self, x):
         """
         x が属する木の root
         :param x:
@@ -49,7 +49,7 @@ class UnionFind:
         """
         if self._parents[x] == x:
             return x
-        self._parents[x] = self.find(self._parents[x])
+        self._parents[x] = self.root(self._parents[x])
         return self._parents[x]
 
     def size(self, x):
@@ -58,7 +58,7 @@ class UnionFind:
         :param x:
         :return:
         """
-        return self._sizes[self.find(x)]
+        return self._sizes[self.root(x)]
 
 
 class WeightedUnionFind:
@@ -92,8 +92,8 @@ class WeightedUnionFind:
         :param w: x と y の重みの差; (重み y) - (重み x)
         :return:
         """
-        rx = self.find(x)
-        ry = self.find(y)
+        rx = self.root(x)
+        ry = self.root(y)
         if rx == ry:
             return
 
@@ -113,7 +113,7 @@ class WeightedUnionFind:
             if self._ranks[rx] == self._ranks[ry]:
                 self._ranks[ry] += 1
 
-    def find(self, x):
+    def root(self, x):
         """
         x が属する木の root
         :param x:
@@ -121,7 +121,7 @@ class WeightedUnionFind:
         """
         if self._parents[x] == x:
             return x
-        root = self.find(self._parents[x])
+        root = self.root(self._parents[x])
         self._weights[x] += self._weights[self._parents[x]]
         self._parents[x] = root
         return root
@@ -132,7 +132,7 @@ class WeightedUnionFind:
         :param x:
         :return:
         """
-        return self._sizes[self.find(x)]
+        return self._sizes[self.root(x)]
 
     def weight(self, x):
         """
@@ -140,7 +140,7 @@ class WeightedUnionFind:
         :return:
         """
         # 経路圧縮
-        self.find(x)
+        self.root(x)
         return self._weights[x]
 
     def diff(self, x, y):
@@ -150,7 +150,7 @@ class WeightedUnionFind:
         :param y:
         :return:
         """
-        if self.find(x) == self.find(y):
+        if self.root(x) == self.root(y):
             return self._weights[y] - self._weights[x]
         return float("inf")
 
@@ -158,15 +158,15 @@ class WeightedUnionFind:
 if __name__ == "__main__":
     uf = UnionFind(nodes=[i for i in range(10)])
 
-    assert uf.find(0) == 0
-    assert uf.find(1) == 1
+    assert uf.root(0) == 0
+    assert uf.root(1) == 1
 
     uf.unite(1, 2)
     uf.unite(3, 4)
     uf.unite(1, 4)
     uf.unite(7, 8)
-    assert uf.find(3) == uf.find(2)
-    assert uf.find(1) != uf.find(7)
+    assert uf.root(3) == uf.root(2)
+    assert uf.root(1) != uf.root(7)
     assert uf.size(1) == uf.size(2) == uf.size(3) == uf.size(4) == 4
     assert uf.size(7) == uf.size(8) == 2
     assert uf.size(5) == 1
@@ -174,5 +174,5 @@ if __name__ == "__main__":
     uf2 = UnionFind(nodes=["a", "b", "c", "d", "e"])
     uf2.unite("a", "e")
     uf2.unite("c", "e")
-    assert uf2.find("a") == uf2.find("c")
-    assert uf2.find("b") != uf2.find("e")
+    assert uf2.root("a") == uf2.root("c")
+    assert uf2.root("b") != uf2.root("e")
