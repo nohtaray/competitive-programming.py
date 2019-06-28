@@ -20,6 +20,7 @@ def bisect_right_callable(fn, x, lo, hi):
 
 def bisect_left_callable(fn, x, lo, hi):
     """
+    (memo) いっぱい呼ぶなら np.searchsorted のほうがベクトル化されててはやそう
     lo から hi-1 のうち、fn の結果が x 以上となる、最も左の値
     bisect.bisect_left と同じ
     https://docs.python.org/ja/3/library/bisect.html

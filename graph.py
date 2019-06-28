@@ -18,7 +18,7 @@ import scipy.sparse.csgraph
 def floyd_warshall(*args, **kwargs):
     """
     これでもよさそう
-    https://atcoder.jp/contests/abc074/submissions/5706363
+    https://atcoder.jp/contests/abc051/submissions/6148260
     :param args:
     :param kwargs:
     :return:
