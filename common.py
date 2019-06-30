@@ -20,3 +20,5 @@ if os.getenv("LOCAL"):
 sys.setrecursionlimit(2147483647)
 INF = float("inf")
 IINF = 10 ** 18
+MOD = 10 ** 9 + 7
+
