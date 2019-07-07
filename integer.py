@@ -1,4 +1,7 @@
 import math
+from functools import reduce
+
+from operator import mul
 
 
 def get_divisors(n):
@@ -51,7 +54,7 @@ def div_mod(a, b, mod):
     :param int mod:
     :return:
     """
-    return a * pow(b, mod - 2, mod)
+    return a * pow(b, mod - 2, mod) % mod
 
 
 def mod_inv(a, mod):
@@ -77,15 +80,16 @@ def ncr(n, r, mod=None):
         return 0
 
     # 何度も呼ぶ場合は最大の n 以下の階乗を事前に計算しておくといい
+    # return factorials[n] * mod_inv(factorials[r], mod) * mod_inv(factorials[n - r], mod) % mod
+    r = min(n - r, r)
+    if r == 0:
+        return 1
     if mod:
-        return (
-            math.factorial(n)
-            * mod_inv(math.factorial(r), mod)
-            * mod_inv(math.factorial(n - r), mod)
-            % mod
-        )
+        return reduce(mul, range(n, n - r, -1)) * mod_inv(reduce(mul, range(r, 0, -1)), mod) % mod
     else:
-        return math.factorial(n) // math.factorial(r) // math.factorial(n - r)
+        # math.factorial よりこっちのが速い
+        # https://atcoder.jp/contests/abc110/submissions?f.Task=&f.Language=&f.Status=&f.User=nohtaray
+        return reduce(mul, range(n, n - r, -1)) // reduce(mul, range(r, 0, -1))
 
 
 def nhr(n, r, mod=None):
