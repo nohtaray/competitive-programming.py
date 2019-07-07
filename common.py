@@ -7,6 +7,7 @@ import re
 import string
 import sys
 from collections import Counter, deque, defaultdict
+from copy import deepcopy
 from decimal import Decimal
 from fractions import gcd
 from functools import lru_cache, reduce
