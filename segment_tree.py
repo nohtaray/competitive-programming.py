@@ -3,25 +3,38 @@ import operator
 
 class SegmentTree:
     # http://tsutaj.hatenablog.com/entry/2017/03/29/204841
-    def __init__(self, size, fn=operator.add, default=0):
+    def __init__(self, size, fn=operator.add, default=None, initial_values=None):
         """
         :param int size:
         :param callable fn: 区間に適用する関数。引数を 2 つ取る。min, max, operator.xor など
         :param default:
+        :param list initial_values:
         """
-        # size 以上である最小の 2 冪
+        default = default or 0
+
+        # size 以上である最小の 2 冪を size とする
         n = 1
         while n < size:
             n *= 2
         self._size = n
-        self._tree = [default for _ in range(self._size * 2 - 1)]
         self._fn = fn
+
+        self._tree = [default] * (self._size * 2 - 1)
+        if initial_values:
+            i = self._size - 1
+            for v in initial_values:
+                self._tree[i] = v
+                i += 1
+            i = self._size - 2
+            while i >= 0:
+                self._tree[i] = self._fn(self._tree[i * 2 + 1], self._tree[i * 2 + 2])
+                i -= 1
 
     def set(self, i, value):
         """
         i 番目に value を設定
         :param int i:
-        :param int value:
+        :param value:
         :return:
         """
         x = self._size - 1 + i
@@ -35,7 +48,7 @@ class SegmentTree:
         """
         もとの i 番目と value に fn を適用したものを i 番目に設定
         :param int i:
-        :param int value:
+        :param value:
         :return:
         """
         x = self._size - 1 + i
