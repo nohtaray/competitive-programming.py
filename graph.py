@@ -61,3 +61,37 @@ def dijkstra(graph, start):
                 dist[u] = w + dw
                 heapq.heappush(heap, (w + dw, u))
     return dist
+
+
+def eulerian_trail(tree, max_v, root=0):
+    """
+    木のオイラー路; オイラーツアー
+    :param list of (list of (int, int)) tree:
+    :param int max_v:
+    :param int root:
+    :return: (trails, depths, weights)
+    :rtype: (list of int, list of int, list of int)
+    """
+    seen = [False] * (max_v + 1)
+    # 頂点の履歴
+    trails = []
+    # 深さの履歴
+    depths = []
+    # 距離の履歴
+    weights = []
+    # Overflow 回避のためループで
+    stack = [(root, 0, 0, True)]
+    while stack:
+        v, d, w, forward = stack.pop()
+        seen[v] = True
+        trails.append(v)
+        depths.append(d)
+        weights.append(w)
+        if not forward:
+            continue
+
+        for u, w in tree[v]:
+            if not seen[u]:
+                stack.append((v, d, -w, False))
+                stack.append((u, d + 1, w, True))
+    return trails, depths, weights
