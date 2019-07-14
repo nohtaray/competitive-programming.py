@@ -1,9 +1,9 @@
 import math
 
 
-class BisectLCA:
+class DoublingLCA:
     """
-    LCA 二分探索版
+    LCA ダブリング版
     初期化 O(NlogN)、クエリ O(logN)
     """
 
@@ -17,7 +17,8 @@ class BisectLCA:
         self.size = max_v + 1
         self.root = root
 
-        self.MAX_LOG_V = math.floor(math.log2(self.size)) + 1
+        # AtCoder の PyPy 2.4.0 では math.log2 が使えない
+        self.MAX_LOG_V = math.floor(math.log(self.size, 2)) + 1
         # depths[v]: v の root からの距離
         self.depths = [-1] * self.size
         # parents[k][v]: 親に 2^k たどった頂点
@@ -27,13 +28,16 @@ class BisectLCA:
 
     def _init(self):
         # depths と parents[0] を初期化
+        seen = [False] * self.size
         stack = [(self.root, 0, -1)]
         while stack:
             v, d, par = stack.pop()
             self.parents[0][v] = par
             self.depths[v] = d
+            seen[v] = True
             for u in self.graph[v]:
-                stack.append((u, d + 1, v))
+                if not seen[u]:
+                    stack.append((u, d + 1, v))
 
         # 各 parents を初期化
         for k in range(self.MAX_LOG_V - 1):
