@@ -48,20 +48,30 @@ def get_factorials(max, mod=None):
     return ret
 
 
-# https://atcoder.jp/contests/abc066/submissions/5721975
 def mod_invs(max, mod):
     """
     逆元のリスト 0 から max まで
-    https://atcoder.jp/contests/abc127/submissions/5630531
-    ここから。あんまり良くわかってない
-    :param max:
-    :param mod:
-    :return:
+    :param int max:
+    :param int mod:
     """
     invs = [1] * (max + 1)
     for x in range(2, max + 1):
         invs[x] = (-(mod // x) * invs[mod % x]) % mod
     return invs
+
+
+def factorial_invs(max, mod):
+    """
+    階乗 0!, 1!, 2!, ..., max! の逆元
+    :param int max:
+    :param int mod:
+    """
+    ret = []
+    r = 1
+    for inv in mod_invs(max, mod):
+        r = r * inv % mod
+        ret.append(r)
+    return ret
 
 
 def get_ncrs(n, mod):
