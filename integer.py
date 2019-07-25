@@ -79,8 +79,7 @@ def ncr(n, r, mod=None):
     if n < r:
         return 0
 
-    # 何度も呼ぶ場合は最大の n 以下の階乗を事前に計算しておくといい
-    # return factorials[n] * mod_inv(factorials[r], mod) * mod_inv(factorials[n - r], mod) % mod
+    # 何度も呼ぶ場合は combination.py をつかう
     r = min(n - r, r)
     if r == 0:
         return 1
