@@ -2,6 +2,7 @@ import bisect
 import heapq
 import itertools
 import math
+import operator
 import os
 import re
 import string
@@ -11,7 +12,7 @@ from copy import deepcopy
 from decimal import Decimal
 from fractions import gcd
 from functools import lru_cache, reduce
-from operator import itemgetter
+from operator import itemgetter, mul, add, xor
 
 import numpy as np
 
