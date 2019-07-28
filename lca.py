@@ -64,3 +64,14 @@ class DoublingLCA:
                 u = self.parents[k][u]
                 v = self.parents[k][v]
         return self.parents[0][u]
+
+    def distance(self, u, v):
+        """
+        u, v 間の距離
+        depth[u] + depth[v] - depth[lca] * 2
+        :param u:
+        :param v:
+        :rtype: int
+        """
+        lca = self.lca(u, v)
+        return self.depths[u] + self.depths[v] - self.depths[lca] * 2
