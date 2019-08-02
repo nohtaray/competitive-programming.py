@@ -1,3 +1,4 @@
+import heapq
 from collections import deque, defaultdict
 
 
@@ -351,4 +352,97 @@ class DictMinCostFlow:
 
             remains -= flow
             total_cost += cost
+        return total_cost
+
+
+class PrimalDual:
+    """
+    最小費用流 ダイクストラ版
+    """
+
+    def __init__(self, graph=None, residual=None):
+        """
+        :param list of (list of (int, int, int)) graph: (to, cap, cost) の隣接リスト
+        :param list of (list of (list of (int|list))) residual: (to, cap, cost, rev) の残余グラフ
+        """
+        assert (graph and not residual) or (not graph and residual)
+        if graph:
+            self.graph = self.residual_graph(graph)
+        else:
+            self.graph = residual
+
+    @staticmethod
+    def residual_graph(graph):
+        """
+        残余グラフ構築
+        :param list of (list of (int, int, int)) graph: (to, cap, cost) の隣接リスト
+        :rtype: list of (list of (list of (int|list)))
+        :return: (to, cap, cost, rev) の残余グラフ
+        """
+        ret = [[] for _ in range(len(graph))]
+        for v in range(len(graph)):
+            for u, cap, cost in graph[v]:
+                rev = [v, 0, -cost]
+                edge = [u, cap, cost, rev]
+                rev.append(edge)
+                ret[v].append(edge)
+                ret[u].append(rev)
+        return ret
+
+    def solve(self, from_v, to_v, flow):
+        """
+        :param int from_v:
+        :param int to_v:
+        :param int flow:
+        :rtype: int
+        """
+        total_cost = 0
+        prevv = [-1] * len(self.graph)
+        preve = [-1] * len(self.graph)
+        # ポテンシャル
+        h = [0] * len(self.graph)
+        remains = flow
+        while remains > 0:
+            print(remains)
+            dist = [float('inf')] * len(self.graph)
+            dist[from_v] = 0
+            heap = [(0, from_v)]
+
+            # Dijkstra
+            while heap:
+                d, v = heapq.heappop(heap)
+                if d > dist[v]:
+                    continue
+                for edge in self.graph[v]:
+                    u, cap, cost, rev = edge
+                    if cap > 0 and dist[v] + cost + h[v] - h[u] < dist[u]:
+                        dist[u] = dist[v] + cost + h[v] - h[u]
+                        prevv[u] = v
+                        preve[u] = edge
+                        heapq.heappush(heap, (dist[u], u))
+
+            if dist[to_v] == float('inf'):
+                # これ以上流せない
+                return -1
+
+            for i, d in enumerate(dist):
+                h[i] += d
+
+            # 最短路に流せる量
+            flow = remains
+            v = to_v
+            while v != from_v:
+                cap = preve[v][1]
+                flow = min(cap, flow)
+                v = prevv[v]
+
+            # 最短路に flow だけ流す
+            v = to_v
+            while v != from_v:
+                preve[v][1] -= flow
+                preve[v][3][1] += flow
+                v = prevv[v]
+
+            remains -= flow
+            total_cost += flow * h[to_v]
         return total_cost
