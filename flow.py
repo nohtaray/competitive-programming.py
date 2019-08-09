@@ -403,7 +403,6 @@ class PrimalDual:
         h = [0] * len(self.graph)
         remains = flow
         while remains > 0:
-            print(remains)
             dist = [float('inf')] * len(self.graph)
             dist[from_v] = 0
             heap = [(0, from_v)]
