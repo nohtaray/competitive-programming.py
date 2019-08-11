@@ -16,7 +16,6 @@ class BinaryIndexedTree:
         """
         x = i + 1
         while x <= self._size:
-            # FIXME: - 1 してるから定数倍遅くなってたりとかする？
             self._bit[x - 1] += w
             x += x & -x
 
