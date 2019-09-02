@@ -143,3 +143,36 @@ def eulerian_trail(tree, max_v, root=0):
                 stack.append((v, d, -w, False))
                 stack.append((u, d + 1, w, True))
     return trails, depths, weights
+
+
+def topological_sort(graph):
+    """
+    :param list of (list of int) graph:
+    :return:
+    """
+    # 入次数
+    ins = [0] * len(graph)
+    for vs in graph:
+        for v in vs:
+            ins[v] += 1
+
+    # 入次数がゼロのやつ
+    zeros = []
+    for v, cnt in enumerate(ins):
+        if cnt == 0:
+            zeros.append(v)
+
+    # 入次数がゼロのやつから順に追加してく
+    ret = []
+    while zeros:
+        v = zeros.pop()
+        ret.append(v)
+        for u in graph[v]:
+            ins[u] -= 1
+            if ins[u] == 0:
+                zeros.append(u)
+
+    if len(ret) != len(graph):
+        raise ValueError('閉路があります')
+
+    return ret
