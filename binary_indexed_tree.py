@@ -36,20 +36,14 @@ class BinaryIndexedTree:
         return self._size
 
 
-def compress(li):
+def compress(li, origin=0):
     """
-    大小関係を保ったまま 1 以上の数値に圧縮する。
-    scipy.stats.rankdata に近い感じ
-    :param list li:
+    座圧
+    :param li:
+    :param int origin:
     :rtype: list of int
     """
-    ret = [0] * len(li)
-    rank = 0
-    prev = None
-    for a, i in sorted([(a, i) for i, a in enumerate(li)]):
-        if a != prev:
-            rank += 1
-        ret[i] = rank
+    *ret, = map({v: i + origin for i, v in enumerate(sorted(set(li)))}.__getitem__, li)
     return ret
 
 
