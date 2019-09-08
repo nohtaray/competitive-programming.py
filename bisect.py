@@ -1,4 +1,4 @@
-def bisect_right_callable(fn, x, lo, hi):
+def bright(fn, x, lo, hi):
     """
     lo から hi-1 のうち、fn の結果が x 以下となる、最も右の値 + 1
     bisect.bisect_right と同じ
@@ -18,7 +18,7 @@ def bisect_right_callable(fn, x, lo, hi):
     return lo
 
 
-def bisect_left_callable(fn, x, lo, hi):
+def bleft(fn, x, lo, hi):
     """
     (memo) いっぱい呼ぶなら np.searchsorted のほうがベクトル化されててはやそう
     lo から hi-1 のうち、fn の結果が x 以上となる、最も左の値
