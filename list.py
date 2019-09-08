@@ -32,6 +32,10 @@ def cumsum(it):
     return list(itertools.accumulate(it, operator.add))
 
 
+def argsort(li, key=None, reverse=False):
+    return [i for _, i in sorted([(a, i) for i, a in enumerate(li)], key=lambda t: key(t[0]), reverse=reverse)]
+
+
 if __name__ == "__main__":
     li = [3, 1, 4, 1, 5, 9, 2, 6]
     assert cummax(li) == [3, 3, 4, 4, 5, 9, 9, 9]
