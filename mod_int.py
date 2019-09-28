@@ -9,6 +9,12 @@ def ModInt(mod):
             else:
                 return _ModInt(self.value + other)
 
+        def __sub__(self, other):
+            if isinstance(other, _ModInt):
+                return _ModInt(self.value - other.value)
+            else:
+                return _ModInt(self.value - other)
+
         def __radd__(self, other):
             return self.__add__(other)
 
