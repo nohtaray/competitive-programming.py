@@ -37,3 +37,27 @@ def bleft(fn, x, lo, hi):
         else:
             hi = mid
     return lo
+
+
+def tleft(fn, lo, hi):
+    """
+    fn の結果が最も小さくなるインデックスを三分探索する
+    :param callable fn:
+    :param int lo: 最小のインデックス
+    :param int hi: 最大のインデックス + 1
+    :return: lo <= ret < hi
+    """
+    left = lo
+    right = hi
+    while abs(right - left) >= 3:
+        r1 = (left * 2 + right) // 3
+        r2 = (left + right * 2) // 3
+        if fn(r1) <= fn(r2):
+            right = r2
+        else:
+            left = r1
+    if left + 1 >= hi or fn(left) <= fn(left + 1):
+        return left
+    if left + 2 >= hi or fn(left + 1) <= fn(left + 2):
+        return left + 1
+    return left + 2
