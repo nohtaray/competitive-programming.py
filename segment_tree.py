@@ -54,7 +54,7 @@ class SegmentTree:
         x = self._size - 1 + i
         self.set(i, self._fn(self._tree[x], value))
 
-    def get(self, from_i, to_i, k=0, L=None, r=None):
+    def get(self, from_i, to_i=None, k=0, L=None, r=None):
         """
         [from_i, to_i) に fn を適用した結果を返す
         :param int from_i:
@@ -64,6 +64,9 @@ class SegmentTree:
         :param int r:
         :return:
         """
+        if to_i is None:
+            return self._tree[self._size - 1 + from_i]
+
         L = 0 if L is None else L
         r = self._size if r is None else r
 
