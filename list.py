@@ -46,7 +46,9 @@ def cumsum(it):
 
 
 def argsort(li, key=None, reverse=False):
-    return [i for _, i in sorted([(a, i) for i, a in enumerate(li)], key=lambda t: key(t[0]), reverse=reverse)]
+    return [i for _, i in sorted(
+        [(a, i) for i, a in enumerate(li)], key=(lambda t: key(t[0])) if key else None, reverse=reverse
+    )]
 
 
 if __name__ == "__main__":
