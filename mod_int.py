@@ -25,8 +25,10 @@ def ModInt(mod):
                 return _ModInt(self.value * other)
 
         def __truediv__(self, other):
-            # TODO: 実装
             raise NotImplementedError()
+
+        def __int__(self):
+            return self.value
 
         def __repr__(self):
             return str(self.value)
@@ -36,6 +38,6 @@ def ModInt(mod):
 
 if __name__ == '__main__':
     MI7 = ModInt(mod=7)
-    assert str(MI7(1) + MI7(8)) == '2'
-    assert str(MI7(1) + 8) == '2'
-    assert str(8 + MI7(1)) == '2'
+    assert int(MI7(1) + MI7(8)) == 2
+    assert int(MI7(1) + 8) == 2
+    assert int(8 + MI7(1)) == 2
