@@ -1,4 +1,5 @@
 import cmath
+import math
 
 INF = float("inf")
 PI = cmath.pi
@@ -97,6 +98,7 @@ class Point:
     def ccw(a, b, c):
         """
         線分 ab に対する c の位置
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_1_C&lang=ja
         :param Point a:
         :param Point b:
         :param Point c:
@@ -154,12 +156,13 @@ class Point:
 
     def angle(self, p, q):
         """
-        p に向かってる状態から q まで反時計回りに回転するときの角度
+        p に向いてる状態から q まで反時計回りに回転するときの角度
+        -pi <= ret <= pi
         :param Point p:
         :param Point q:
         :rtype: float
         """
-        return (cmath.phase(q.c - self.c) - cmath.phase(p.c - self.c)) % TAU
+        return (cmath.phase(q.c - self.c) - cmath.phase(p.c - self.c) + PI) % TAU - PI
 
     def area(self, p, q):
         """
@@ -384,3 +387,95 @@ class Segment:
             s.dist(self.p1),
             s.dist(self.p2),
         )
+
+
+class Polygon:
+    """
+    2次元空間上の多角形
+    """
+
+    def __init__(self, points):
+        """
+        :param list of Point points:
+        """
+        self.points = points
+
+    def iter2(self):
+        """
+        隣り合う2点を順に返すイテレータ
+        :rtype: typing.Iterator[(Point, Point)]
+        """
+        return zip(self.points, self.points[1:] + self.points[:1])
+
+    def iter3(self):
+        """
+        隣り合う3点を順に返すイテレータ
+        :rtype: typing.Iterator[(Point, Point, Point)]
+        """
+        return zip(self.points,
+                   self.points[1:] + self.points[:1],
+                   self.points[2:] + self.points[:2])
+
+    def area(self):
+        """
+        面積
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_3_A&lang=ja
+        """
+        # 外積の和 / 2
+        dets = []
+        for p, q in self.iter2():
+            dets.append(p.det(q))
+        return abs(math.fsum(dets)) / 2
+
+    def is_convex(self, allow_straight=False, allow_collapsed=False):
+        """
+        凸多角形かどうか
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_3_B&lang=ja
+        :param allow_straight: 3点がまっすぐ並んでるのを許容するかどうか
+        :param allow_collapsed: 面積がゼロの場合を許容するか
+        """
+        ccw = []
+        for a, b, c in self.iter3():
+            ccw.append(Point.ccw(a, b, c))
+        ccw = set(ccw)
+        if len(ccw) == 1:
+            if ccw == {Point.CCW_CLOCKWISE}:
+                return True
+            if ccw == {Point.CCW_COUNTER_CLOCKWISE}:
+                return True
+        if allow_straight and len(ccw) == 2:
+            if ccw == {Point.CCW_ONLINE_FRONT, Point.CCW_CLOCKWISE}:
+                return True
+            if ccw == {Point.CCW_ONLINE_FRONT, Point.CCW_COUNTER_CLOCKWISE}:
+                return True
+        if allow_collapsed and len(ccw) == 3:
+            return ccw == {Point.CCW_ONLINE_FRONT, Point.CCW_ONLINE_BACK, Point.CCW_ON_SEGMENT}
+        return False
+
+    def has_point_on_edge(self, p):
+        """
+        指定した点が辺上にあるか
+        :param Point p:
+        :rtype: bool
+        """
+        for a, b in self.iter2():
+            if Point.ccw(a, b, p) == Point.CCW_ON_SEGMENT:
+                return True
+        return False
+
+    def contains(self, p, allow_on_edge=True):
+        """
+        指定した点を含むか
+        Winding Number Algorithm
+        https://www.nttpc.co.jp/technology/number_algorithm.html
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_3_C&lang=ja
+        :param Point p:
+        :param bool allow_on_edge: 辺上の点を許容するか
+        """
+        angles = []
+        for a, b in self.iter2():
+            if Point.ccw(a, b, p) == Point.CCW_ON_SEGMENT:
+                return allow_on_edge
+            angles.append(p.angle(a, b))
+        # 一周以上するなら含む
+        return abs(math.fsum(angles)) > EPS
