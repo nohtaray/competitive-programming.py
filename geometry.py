@@ -479,3 +479,41 @@ class Polygon:
             angles.append(p.angle(a, b))
         # 一周以上するなら含む
         return abs(math.fsum(angles)) > EPS
+
+    @staticmethod
+    def convex_hull(points, allow_straight=False):
+        """
+        凸包。x が最も小さい点のうち y が最も小さい点から右回り。
+        Graham Scan O(N log N)
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_4_A&lang=ja
+        :param list of Point points:
+        :param allow_straight: 3点がまっすぐ並んでるのを許容するかどうか
+        :rtype: Polygon
+        """
+        points = points[:]
+        points.sort(key=lambda p: (p.x, p.y))
+
+        # allow_straight なら 0 を許容する
+        det_lower = -EPS if allow_straight else EPS
+
+        sz = 0
+        #: :type: list of (Point|None)
+        ret = [None] * (N * 2)
+        for p in points:
+            while sz > 1 and (ret[sz - 1] - ret[sz - 2]).det(p - ret[sz - 1]) < det_lower:
+                sz -= 1
+            ret[sz] = p
+            sz += 1
+        floor = sz
+        for p in reversed(points[:-1]):
+            while sz > floor and (ret[sz - 1] - ret[sz - 2]).det(p - ret[sz - 1]) < det_lower:
+                sz -= 1
+            ret[sz] = p
+            sz += 1
+        ret = ret[:sz - 1]
+
+        if allow_straight and len(ret) > len(points):
+            # allow_straight かつ全部一直線のときに二重にカウントしちゃう
+            ret = points
+        return Polygon(ret)
+
