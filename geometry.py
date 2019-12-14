@@ -4,7 +4,7 @@ import math
 INF = float("inf")
 PI = cmath.pi
 TAU = cmath.pi * 2
-EPS = 1e-8
+EPS = 1e-10
 
 
 class Point:
@@ -295,9 +295,7 @@ class Line:
     def intersection_point(self, l):
         """
         交差する点
-        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_B&lang=ja
         Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_C&lang=ja
-        FIXME: 誤差が気になる。EPS <= 1e-9 だと CGL_2_B ダメだった。
         :param Line l:
         :rtype: Point|None
         """
@@ -310,6 +308,20 @@ class Line:
         x = (b1 * c2 - b2 * c1) / det
         y = (a2 * c1 - a1 * c2) / det
         return Point.from_rect(x, y)
+
+    def dist(self, p):
+        """
+        他の点との最短距離
+        :param Point p:
+        """
+        raise NotImplementedError()
+
+    def has_point(self, p):
+        """
+        p が直線上に乗っているかどうか
+        :param Point p:
+        """
+        return abs(self.a * p.x + self.b * p.y + self.c) < EPS
 
 
 class Segment:
@@ -331,6 +343,32 @@ class Segment:
         """
         return abs(self.p1 - self.p2)
 
+    def phase(self):
+        """
+        p1 を原点としたときの p2 の角度
+        """
+        return cmath.phase(self.p2 - self.p1)
+
+    def is_parallel_to(self, s):
+        """
+        平行かどうか
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_A&lang=ja
+        :param Segment s:
+        :return:
+        """
+        # 外積がゼロ
+        return abs((self.p1 - self.p2).det(s.p1 - s.p2)) < EPS
+
+    def is_orthogonal_to(self, s):
+        """
+        直行しているかどうか
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_A&lang=ja
+        :param Segment s:
+        :return:
+        """
+        # 内積がゼロ
+        return abs((self.p1 - self.p2).dot(s.p1 - s.p2)) < EPS
+
     def intersects_with(self, s, allow_side=True):
         """
         交差するかどうか
@@ -338,18 +376,21 @@ class Segment:
         :param Segment s:
         :param allow_side: 端っこでギリギリ触れているのを許容するか
         """
-        l1 = Line.from_segment(self.p1, self.p2)
-        l2 = Line.from_segment(s.p1, s.p2)
-        if l1.is_parallel_to(l2):
+        if self.is_parallel_to(s):
             # 並行なら線分の端点がもう片方の線分の上にあるかどうか
             return (s.p1.on_segment(self.p1, self.p2, allow_side) or
                     s.p2.on_segment(self.p1, self.p2, allow_side) or
                     self.p1.on_segment(s.p1, s.p2, allow_side) or
                     self.p2.on_segment(s.p1, s.p2, allow_side))
         else:
-            # 直線同士の交点が線分の上にあるかどうか
-            p = l1.intersection_point(l2)
-            return p.on_segment(self.p1, self.p2, allow_side) and p.on_segment(s.p1, s.p2, allow_side)
+            # allow_side ならゼロを許容する
+            det_lower = EPS if allow_side else -EPS
+            ok = True
+            # self の両側に s.p1 と s.p2 があるか
+            ok &= (self.p2 - self.p1).det(s.p1 - self.p1) * (self.p2 - self.p1).det(s.p2 - self.p1) < det_lower
+            # s の両側に self.p1 と self.p2 があるか
+            ok &= (s.p2 - s.p1).det(self.p1 - s.p1) * (s.p2 - s.p1).det(self.p2 - s.p1) < det_lower
+            return ok
 
     def closest_point(self, p):
         """
@@ -559,3 +600,58 @@ class Polygon:
             else:
                 i = ni
         return ret
+
+    def convex_cut_by_line(self, line_p1, line_p2):
+        """
+        凸多角形を直線 line_p1-line_p2 でカットする。
+        凸じゃないといけません
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_4_C&lang=ja
+        :param line_p1:
+        :param line_p2:
+        :return: (line_p1-line_p2 の左側の多角形, line_p1-line_p2 の右側の多角形)
+        :rtype: (Polygon|None, Polygon|None)
+        """
+        n = len(self.points)
+        line = Line.from_segment(line_p1, line_p2)
+        # 直線と重なる点
+        on_line_points = []
+        for i, p in enumerate(self.points):
+            if line.has_point(p):
+                on_line_points.append(i)
+
+        # 辺が直線上にある
+        has_on_line_edge = False
+        if len(on_line_points) >= 3:
+            has_on_line_edge = True
+        elif len(on_line_points) == 2:
+            # 直線上にある点が隣り合ってる
+            has_on_line_edge = abs(on_line_points[0] - on_line_points[1]) in [1, n - 1]
+        # 辺が直線上にある場合、どっちか片方に全部ある
+        if has_on_line_edge:
+            for p in self.points:
+                ccw = Point.ccw(line_p1, line_p2, p)
+                if ccw == Point.CCW_COUNTER_CLOCKWISE:
+                    return Polygon(self.points[:]), None
+                if ccw == Point.CCW_CLOCKWISE:
+                    return None, Polygon(self.points[:])
+
+        ret_lefts = []
+        ret_rights = []
+        d = line_p2 - line_p1
+        for p, q in self.iter2():
+            det_p = d.det(p - line_p1)
+            det_q = d.det(q - line_p1)
+            if det_p > -EPS:
+                ret_lefts.append(p)
+            if det_p < EPS:
+                ret_rights.append(p)
+            # 外積の符号が違う == 直線の反対側にある場合は交点を追加
+            if det_p * det_q < -EPS:
+                intersection = line.intersection_point(Line.from_segment(p, q))
+                ret_lefts.append(intersection)
+                ret_rights.append(intersection)
+
+        # 点のみの場合を除いて返す
+        l = Polygon(ret_lefts) if len(ret_lefts) > 1 else None
+        r = Polygon(ret_rights) if len(ret_rights) > 1 else None
+        return l, r
