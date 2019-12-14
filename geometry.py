@@ -98,6 +98,7 @@ class Point:
     def ccw(a, b, c):
         """
         線分 ab に対する c の位置
+        線分上にあるか判定するだけなら on_segment とかのが速い
         Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_1_C&lang=ja
         :param Point a:
         :param Point b:
@@ -297,7 +298,7 @@ class Line:
         Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_B&lang=ja
         Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_C&lang=ja
         FIXME: 誤差が気になる。EPS <= 1e-9 だと CGL_2_B ダメだった。
-        :param l:
+        :param Line l:
         :rtype: Point|None
         """
         a1, b1, c1 = self.a, self.b, self.c
@@ -388,6 +389,14 @@ class Segment:
             s.dist(self.p2),
         )
 
+    def has_point(self, p, allow_side=True):
+        """
+        p が線分上に乗っているかどうか
+        :param Point p:
+        :param allow_side: 端っこでギリギリ触れているのを許容するか
+        """
+        return p.on_segment(self.p1, self.p2, allow_side=allow_side)
+
 
 class Polygon:
     """
@@ -459,7 +468,7 @@ class Polygon:
         :rtype: bool
         """
         for a, b in self.iter2():
-            if Point.ccw(a, b, p) == Point.CCW_ON_SEGMENT:
+            if p.on_segment(a, b):
                 return True
         return False
 
@@ -474,7 +483,7 @@ class Polygon:
         """
         angles = []
         for a, b in self.iter2():
-            if Point.ccw(a, b, p) == Point.CCW_ON_SEGMENT:
+            if p.on_segment(a, b):
                 return allow_on_edge
             angles.append(p.angle(a, b))
         # 一周以上するなら含む
@@ -483,12 +492,12 @@ class Polygon:
     @staticmethod
     def convex_hull(points, allow_straight=False):
         """
-        凸包。x が最も小さい点のうち y が最も小さい点から右回り。
+        凸包。x が最も小さい点のうち y が最も小さい点から反時計回り。
         Graham Scan O(N log N)
         Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_4_A&lang=ja
         :param list of Point points:
         :param allow_straight: 3点がまっすぐ並んでるのを許容するかどうか
-        :rtype: Polygon
+        :rtype: list of Point
         """
         points = points[:]
         points.sort(key=lambda p: (p.x, p.y))
@@ -515,5 +524,38 @@ class Polygon:
         if allow_straight and len(ret) > len(points):
             # allow_straight かつ全部一直線のときに二重にカウントしちゃう
             ret = points
-        return Polygon(ret)
+        return ret
 
+    @staticmethod
+    def diameter(points):
+        """
+        直径
+        凸包構築 O(N log N) + カリパー法 O(N)
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_4_B&lang=ja
+        :param list of Point points:
+        """
+        # 反時計回り
+        points = Polygon.convex_hull(points, allow_straight=False)
+        if len(points) == 1:
+            return 0.0
+        if len(points) == 2:
+            return abs(points[0] - points[1])
+
+        # x軸方向に最も遠い点対
+        si = points.index(min(points, key=lambda p: (p.x, p.y)))
+        sj = points.index(max(points, key=lambda p: (p.x, p.y)))
+        n = len(points)
+
+        ret = 0.0
+        # 半周回転
+        i, j = si, sj
+        while i != sj or j != si:
+            ret = max(ret, abs(points[i] - points[j]))
+            ni = (i + 1) % n
+            nj = (j + 1) % n
+            # 2つの辺が並行になる方向にずらす
+            if (points[ni] - points[i]).det(points[nj] - points[j]) > 0:
+                j = nj
+            else:
+                i = ni
+        return ret
