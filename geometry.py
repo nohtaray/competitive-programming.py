@@ -384,12 +384,12 @@ class Segment:
                     self.p2.on_segment(s.p1, s.p2, allow_side))
         else:
             # allow_side ならゼロを許容する
-            det_lower = EPS if allow_side else -EPS
+            det_upper = EPS if allow_side else -EPS
             ok = True
             # self の両側に s.p1 と s.p2 があるか
-            ok &= (self.p2 - self.p1).det(s.p1 - self.p1) * (self.p2 - self.p1).det(s.p2 - self.p1) < det_lower
+            ok &= (self.p2 - self.p1).det(s.p1 - self.p1) * (self.p2 - self.p1).det(s.p2 - self.p1) < det_upper
             # s の両側に self.p1 と self.p2 があるか
-            ok &= (s.p2 - s.p1).det(self.p1 - s.p1) * (s.p2 - s.p1).det(self.p2 - s.p1) < det_lower
+            ok &= (s.p2 - s.p1).det(self.p1 - s.p1) * (s.p2 - s.p1).det(self.p2 - s.p1) < det_upper
             return ok
 
     def closest_point(self, p):
@@ -548,7 +548,7 @@ class Polygon:
 
         sz = 0
         #: :type: list of (Point|None)
-        ret = [None] * (N * 2)
+        ret = [None] * (len(points) * 2)
         for p in points:
             while sz > 1 and (ret[sz - 1] - ret[sz - 2]).det(p - ret[sz - 1]) < det_lower:
                 sz -= 1
@@ -655,3 +655,71 @@ class Polygon:
         l = Polygon(ret_lefts) if len(ret_lefts) > 1 else None
         r = Polygon(ret_rights) if len(ret_rights) > 1 else None
         return l, r
+
+
+def closest_pair(points):
+    """
+    最近点対
+    Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_5_A&lang=ja
+    :param list of Point points:
+    :rtype: (float, (Point, Point))
+    :return: (距離, 点対)
+    """
+
+    def _rec(xsorted):
+        """
+        :param list of Point xsorted:
+        :rtype: (float, (Point, Point))
+        """
+        n = len(xsorted)
+        if n <= 2:
+            return xsorted[0].dist(xsorted[1]), (xsorted[0], xsorted[1])
+        if n <= 3:
+            # 全探索
+            d = INF
+            pair = None
+            for p, q in itertools.combinations(xsorted, r=2):
+                if p.dist(q) < d:
+                    d = p.dist(q)
+                    pair = p, q
+            return d, pair
+
+        # 分割統治
+        # 両側の最近点対
+        ld, lp = _rec(xsorted[:n // 2])
+        rd, rp = _rec(xsorted[n // 2:])
+        if ld <= rd:
+            d = ld
+            ret_pair = lp
+        else:
+            d = rd
+            ret_pair = rp
+
+        mid_x = xsorted[n // 2].x
+        # 中央から d 以内のやつを集める
+        mid_points = []
+        for p in xsorted:
+            # if abs(p.x - mid_x) < d:
+            if abs(p.x - mid_x) - d < -EPS:
+                mid_points.append(p)
+
+        # この中で距離が d 以内のペアがあれば更新
+        mid_points.sort(key=lambda p: p.y)
+        mid_n = len(mid_points)
+        for i in range(mid_n - 1):
+            j = i + 1
+            p = mid_points[i]
+            q = mid_points[j]
+            # while q.y - p.y < d
+            while (q.y - p.y) - d < -EPS:
+                pq_d = p.dist(q)
+                if pq_d < d:
+                    d = pq_d
+                    ret_pair = p, q
+                j += 1
+                if j >= mid_n:
+                    break
+                q = mid_points[j]
+        return d, ret_pair
+
+    return _rec(list(sorted(points, key=lambda p: p.x)))
