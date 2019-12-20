@@ -1,5 +1,7 @@
 import cmath
+import itertools
 import math
+from collections import defaultdict
 
 INF = float("inf")
 PI = cmath.pi
@@ -659,12 +661,13 @@ class Polygon:
 
 def closest_pair(points):
     """
-    最近点対
+    最近点対 O(N log N)
     Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_5_A&lang=ja
     :param list of Point points:
     :rtype: (float, (Point, Point))
     :return: (距離, 点対)
     """
+    assert len(points) >= 2
 
     def _rec(xsorted):
         """
@@ -723,3 +726,57 @@ def closest_pair(points):
         return d, ret_pair
 
     return _rec(list(sorted(points, key=lambda p: p.x)))
+
+
+def closest_pair_randomized(points):
+    """
+    最近点対 乱択版 O(N)
+    http://ir5.hatenablog.com/entry/20131221/1387557630
+    グリッドの管理が dict だから定数倍気になる
+    Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_5_A&lang=ja
+    :param list of Point points:
+    :rtype: (float, (Point, Point))
+    :return: (距離, 点対)
+    """
+    n = len(points)
+    assert n >= 2
+    if n == 2:
+        return points[0].dist(points[1]), (points[0], points[1])
+
+    # 逐次構成法
+    import random
+    points = points[:]
+    random.shuffle(points)
+
+    DELTA_XY = list(itertools.product([-1, 0, 1], repeat=2))
+    grid = defaultdict(list)
+    delta = INF
+    dist = points[0].dist(points[1])
+    ret_pair = points[0], points[1]
+    for i in range(2, n):
+        if delta < EPS:
+            return 0.0, ret_pair
+        # i 番目より前までを含む grid を構築
+        # if dist < delta:
+        if dist - delta < -EPS:
+            delta = dist
+            grid = defaultdict(list)
+            for a in points[:i]:
+                grid[a.x // delta, a.y // delta].append(a)
+        else:
+            p = points[i - 1]
+            grid[p.x // delta, p.y // delta].append(p)
+
+        p = points[i]
+        dist = delta
+        grid_x = p.x // delta
+        grid_y = p.y // delta
+        # 周り 9 箇所だけ調べれば OK
+        for dx, dy in DELTA_XY:
+            for q in grid[grid_x + dx, grid_y + dy]:
+                d = p.dist(q)
+                # if d < dist:
+                if d - dist < -EPS:
+                    dist = d
+                    ret_pair = p, q
+    return min(delta, dist), ret_pair
