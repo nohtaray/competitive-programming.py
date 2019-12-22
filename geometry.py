@@ -780,3 +780,43 @@ def closest_pair_randomized(points):
                     dist = d
                     ret_pair = p, q
     return min(delta, dist), ret_pair
+
+
+class Circle:
+    def __init__(self, o, r):
+        """
+        :param Point o:
+        :param float r:
+        """
+        self.o = o
+        self.r = r
+
+    def __eq__(self, other):
+        return self.o == other.o and abs(self.r - other.r) < EPS
+
+    def ctc(self, c):
+        """
+        共通接線 common tangent の数
+        4: 離れてる
+        3: 外接
+        2: 交わってる
+        1: 内接
+        0: 内包
+        inf: 同一
+        :param Circle c:
+        :rtype: int
+        """
+        if self.o == c.o:
+            return INF if abs(self.r - c.r) < EPS else 0
+        # 円同士の距離
+        d = self.o.dist(c.o) - self.r - c.r
+        if d > EPS:
+            return 4
+        elif d > -EPS:
+            return 3
+        # elif d > -min(self.r, c.r) * 2:
+        elif d + min(self.r, c.r) * 2 > EPS:
+            return 2
+        elif d + min(self.r, c.r) * 2 > -EPS:
+            return 1
+        return 0
