@@ -25,8 +25,8 @@ class Point:
     # 線分上にある
     CCW_ON_SEGMENT = 0
 
-    def __init__(self, c: complex):
-        self.c = c
+    def __init__(self, x: float, y: float):
+        self.c = complex(x, y)
 
     @property
     def x(self):
@@ -37,18 +37,20 @@ class Point:
         return self.c.imag
 
     @staticmethod
-    def from_rect(x: float, y: float):
-        return Point(complex(x, y))
+    def from_complex(c: complex):
+        return Point(c.real, c.imag)
 
     @staticmethod
     def from_polar(r: float, phi: float):
-        return Point(cmath.rect(r, phi))
+        c = cmath.rect(r, phi)
+        return Point(c.real, c.imag)
 
     def __add__(self, p):
         """
         :param Point p:
         """
-        return Point(self.c + p.c)
+        c = self.c + p.c
+        return Point(c.real, c.imag)
 
     def __iadd__(self, p):
         """
@@ -61,7 +63,8 @@ class Point:
         """
         :param Point p:
         """
-        return Point(self.c - p.c)
+        c = self.c - p.c
+        return Point(c.real, c.imag)
 
     def __isub__(self, p):
         """
@@ -71,14 +74,16 @@ class Point:
         return self
 
     def __mul__(self, f: float):
-        return Point(self.c * f)
+        c = self.c * f
+        return Point(c.real, c.imag)
 
     def __imul__(self, f: float):
         self.c *= f
         return self
 
     def __truediv__(self, f: float):
-        return Point(self.c / f)
+        c = self.c / f
+        return Point(c.real, c.imag)
 
     def __itruediv__(self, f: float):
         self.c /= f
@@ -88,7 +93,8 @@ class Point:
         return "({}, {})".format(round(self.x, 10), round(self.y, 10))
 
     def __neg__(self):
-        return Point(-self.c)
+        c = -self.c
+        return Point(c.real, c.imag)
 
     def __eq__(self, p):
         return abs(self.c - p.c) < EPS
@@ -948,7 +954,7 @@ class Circle:
             return []
         if dist - self.r < EPS:
             # p が円周上にある
-            return [Point(p.c)]
+            return [Point(p.x, p.y)]
 
         a = math.sqrt(dist ** 2 - self.r ** 2)
         b = self.r
