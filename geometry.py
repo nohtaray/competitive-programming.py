@@ -349,7 +349,7 @@ class Segment:
         """
         p1 を原点としたときの p2 の角度
         """
-        return cmath.phase(self.p2 - self.p1)
+        return (self.p2 - self.p1).phase()
 
     def is_parallel_to(self, s):
         """
@@ -803,6 +803,7 @@ class Circle:
         1: 内接
         0: 内包
         inf: 同一
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_7_A&lang=ja
         :param Circle c:
         :rtype: int
         """
@@ -820,3 +821,177 @@ class Circle:
         elif d + min(self.r, c.r) * 2 > -EPS:
             return 1
         return 0
+
+    def has_point_on_edge(self, p):
+        """
+        指定した点が円周上にあるか
+        :param Point p:
+        :rtype: bool
+        """
+        return abs(self.o.dist(p) - self.r) < EPS
+
+    def contains(self, p, allow_on_edge=True):
+        """
+        指定した点を含むか
+        :param Point p:
+        :param bool allow_on_edge: 辺上の点を許容するか
+        """
+        if allow_on_edge:
+            # return self.o.dist(p) <= self.r
+            return self.o.dist(p) - self.r < EPS
+        else:
+            # return self.o.dist(p) < self.r
+            return self.o.dist(p) - self.r < -EPS
+
+    def area(self):
+        """
+        面積
+        """
+        return self.r ** 2 * PI
+
+    def circular_segment_area(self, angle):
+        """
+        弓形⌓の面積
+        :param float angle: 角度ラジアン
+        """
+        # 扇形の面積
+        sector_area = self.area() * angle / TAU
+        # 三角形部分を引く
+        return sector_area - self.r ** 2 * math.sin(angle) / 2
+
+    def intersection_points(self, other, allow_outer=False):
+        """
+        :param Segment|Circle other:
+        :param bool allow_outer:
+        """
+        if isinstance(other, Segment):
+            return self.intersection_points_with_segment(other, allow_outer=allow_outer)
+        if isinstance(other, Circle):
+            return self.intersection_points_with_circle(other)
+        raise NotImplementedError()
+
+    def intersection_points_with_segment(self, s, allow_outer=False):
+        """
+        線分と交差する点のリスト
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_7_D&lang=ja
+        :param Segment s:
+        :param bool allow_outer: 線分の間にない点を含む
+        :rtype: list of Point
+        """
+        # 垂線の足
+        projection_point = self.o.projection_point(s.p1, s.p2, allow_outer=True)
+        # 線分との距離
+        dist = self.o.dist(projection_point)
+        # if dist > self.r:
+        if dist - self.r > EPS:
+            return []
+        if dist - self.r > -EPS:
+            if allow_outer or s.has_point(projection_point):
+                return [projection_point]
+            else:
+                return []
+        # 足から左右に diff だけ動かした座標が答え
+        diff = Point.from_polar(math.sqrt(self.r ** 2 - dist ** 2), s.phase())
+        ret1 = projection_point + diff
+        ret2 = projection_point - diff
+        ret = []
+        if allow_outer or s.has_point(ret1):
+            ret.append(ret1)
+        if allow_outer or s.has_point(ret2):
+            ret.append(ret2)
+        return ret
+
+    def intersection_points_with_circle(self, other):
+        """
+        円と交差する点のリスト
+        Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_7_E&langja
+        :param circle other:
+        :rtype: list of Point
+        """
+        ctc = self.ctc(other)
+        if not 1 <= ctc <= 3:
+            return []
+        if ctc == 3:
+            # 外接
+            return [Point.from_polar(self.r, (other.o - self.o).phase()) + self.o]
+        if ctc == 1:
+            # 内接
+            if self.r > other.r:
+                return [Point.from_polar(self.r, (other.o - self.o).phase()) + self.o]
+            else:
+                return [Point.from_polar(self.r, (self.o - other.o).phase()) + self.o]
+        # 2つ交点がある
+        assert ctc == 2
+
+        a = other.r
+        b = self.r
+        c = self.o.dist(other.o)
+        # 余弦定理で cos(a) を求めます
+        cos_a = (b ** 2 + c ** 2 - a ** 2) / (2 * b * c)
+        angle = math.acos(cos_a)
+        phi = (other.o - self.o).phase()
+        return [
+            self.o + Point.from_polar(self.r, phi + angle),
+            self.o + Point.from_polar(self.r, phi - angle),
+        ]
+
+    def tangent_points_with_point(self, p):
+        """
+        p を通る接線との接点
+        :param Point p:
+        :rtype: list of Point
+        """
+        dist = self.o.dist(p)
+        # if dist < self.r:
+        if dist - self.r < -EPS:
+            # p が円の内部にある
+            return []
+        if dist - self.r < EPS:
+            # p が円周上にある
+            return [Point(p.c)]
+
+        a = math.sqrt(dist ** 2 - self.r ** 2)
+        b = self.r
+        c = dist
+        # 余弦定理で cos(a) を求めます
+        cos_a = (b ** 2 + c ** 2 - a ** 2) / (2 * b * c)
+        angle = math.acos(cos_a)
+        phi = (p - self.o).phase()
+        return [
+            self.o + Point.from_polar(self.r, phi + angle),
+            self.o + Point.from_polar(self.r, phi - angle),
+        ]
+
+    def tangent_points_with_circle(self, other):
+        """
+        other との共通接線との接点
+        :param Circle other:
+        :rtype: list of Point
+        """
+        ctc = self.ctc(other)
+        if ctc > 4:
+            raise ValueError('2つの円が同一です')
+        if ctc == 0:
+            return []
+        if ctc == 1:
+            return self.intersection_points_with_circle(other)
+
+        assert ctc in (2, 3, 4)
+        ret = []
+        # 共通外接線を求める
+        # if self.r == other.r:
+        if abs(self.r - other.r) < EPS:
+            # 半径が同じ == 2つの共通外接線が並行
+            phi = (other.o - self.o).phase()
+            ret.append(self.o + Point.from_polar(self.r, phi + PI / 2))
+            ret.append(self.o + Point.from_polar(self.r, phi - PI / 2))
+        else:
+            # 2つの共通外接線の交点から接線を引く
+            intersection = self.o + (other.o - self.o) / (self.r - other.r) * self.r
+            ret += self.tangent_points_with_point(intersection)
+
+        # 共通内接線を求める
+        # 2つの共通内接線の交点から接線を引く
+        intersection = self.o + (other.o - self.o) / (self.r + other.r) * self.r
+        ret += self.tangent_points_with_point(intersection)
+        return ret
