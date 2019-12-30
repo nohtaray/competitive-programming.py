@@ -143,6 +143,18 @@ def generate_oriented_graph(V, E):
     return ret
 
 
+def generate_tree(V, directed=False):
+    """
+    V 頂点の木を生成する
+    :param int V:
+    :param bool directed:
+    """
+    if directed:
+        return generate_directed_graph(V=V, E=V - 1)
+    else:
+        return generate_undirected_graph(V=V, E=V - 1)
+
+
 def plot_graph(edges, directed=False, weighted=False):
     """
     :param list of tuple edges:
