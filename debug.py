@@ -49,6 +49,8 @@ def plot_figure(*figures):
             ax.plot((f.p1.x, f.p2.x), (f.p1.y, f.p2.y))
         elif type(f).__name__ == geo.Point.__name__:
             ax.plot((f.x,), (f.y,), 'o')
+        elif isinstance(f, complex):
+            ax.plot((f.real,), (f.imag,), 'o')
         elif type(f).__name__ == geo.Line.__name__:
             raise NotImplementedError()
         else:
