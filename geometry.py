@@ -310,7 +310,7 @@ class Line:
         :param Line l:
         """
         # 法線ベクトル同士の外積がゼロ
-        return abs(Point.from_rect(self.a, self.b).det(Point.from_rect(l.a, l.b))) < EPS
+        return abs(Point(self.a, self.b).det(Point(l.a, l.b))) < EPS
 
     def is_orthogonal_to(self, l):
         """
@@ -319,7 +319,7 @@ class Line:
         :param Line l:
         """
         # 法線ベクトル同士の内積がゼロ
-        return abs(Point.from_rect(self.a, self.b).dot(Point.from_rect(l.a, l.b))) < EPS
+        return abs(Point(self.a, self.b).dot(Point(l.a, l.b))) < EPS
 
     def intersection_point(self, l):
         """
@@ -336,7 +336,7 @@ class Line:
             return None
         x = (b1 * c2 - b2 * c1) / det
         y = (a2 * c1 - a1 * c2) / det
-        return Point.from_rect(x, y)
+        return Point(x, y)
 
     def dist(self, p):
         """
@@ -1041,12 +1041,12 @@ class Circle:
         return Circle(o, o.dist(p1))
 
     @staticmethod
-    def min_enclosing_circle(points):
+    def min_enclosing(points):
         """
         points をすべて含む最小の円
         計算量の期待値は O(N)
         https://www.jaist.ac.jp/~uehara/course/2014/i481f/pdf/ppt-7.pdf
-        Verify: https://atcoder.jp/contests/abc151/tasks/abc151_f
+        Verify: https://www.spoj.com/problems/QCJ4/
         :param list of Point points:
         :rtype: Circle
         """
