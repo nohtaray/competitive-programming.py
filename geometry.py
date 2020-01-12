@@ -1,6 +1,7 @@
 import cmath
 import itertools
 import math
+import random
 from collections import defaultdict
 
 INF = float("inf")
@@ -232,6 +233,26 @@ class Point:
         # 外積がゼロ: 面積がゼロ == 一直線
         # 内積がマイナス: p - self - q の順に並んでる
         return abs((p - self).det(q - self)) < EPS and (p - self).dot(q - self) < EPS
+
+    @staticmethod
+    def circumstance_of(p1, p2, p3):
+        """
+        外心
+        :param Point p1:
+        :param Point p2:
+        :param Point p3:
+        :rtype: Point|None
+        """
+        if abs((p2 - p1).det(p3 - p1)) < EPS:
+            # 外積がゼロ == 一直線
+            return None
+        # https://ja.wikipedia.org/wiki/外接円
+        a = (p2.x - p3.x) ** 2 + (p2.y - p3.y) ** 2
+        b = (p3.x - p1.x) ** 2 + (p3.y - p1.y) ** 2
+        c = (p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2
+        num = p1 * a * (b + c - a) + p2 * b * (c + a - b) + p3 * c * (a + b - c)
+        den = a * (b + c - a) + b * (c + a - b) + c * (a + b - c)
+        return num / den
 
 
 class Line:
@@ -750,7 +771,6 @@ def closest_pair_randomized(points):
         return points[0].dist(points[1]), (points[0], points[1])
 
     # 逐次構成法
-    import random
     points = points[:]
     random.shuffle(points)
 
@@ -1000,4 +1020,53 @@ class Circle:
         # 2つの共通内接線の交点から接線を引く
         intersection = self.o + (other.o - self.o) / (self.r + other.r) * self.r
         ret += self.tangent_points_with_point(intersection)
+        return ret
+
+    @staticmethod
+    def circumscribed_of(p1, p2, p3):
+        """
+        p1・p2・p3 のなす三角形の外接円
+        Verify:
+        :param Point p1:
+        :param Point p2:
+        :param Point p3:
+        """
+        if p1.on_segment(p2, p3):
+            return Circle((p2 + p3) / 2, p2.dist(p3) / 2)
+        if p2.on_segment(p1, p3):
+            return Circle((p1 + p3) / 2, p1.dist(p3) / 2)
+        if p3.on_segment(p1, p2):
+            return Circle((p1 + p2) / 2, p1.dist(p2) / 2)
+        o = Point.circumstance_of(p1, p2, p3)
+        return Circle(o, o.dist(p1))
+
+    @staticmethod
+    def min_enclosing_circle(points):
+        """
+        points をすべて含む最小の円
+        計算量の期待値は O(N)
+        https://www.jaist.ac.jp/~uehara/course/2014/i481f/pdf/ppt-7.pdf
+        Verify: https://atcoder.jp/contests/abc151/tasks/abc151_f
+        :param list of Point points:
+        :rtype: Circle
+        """
+        points = points[:]
+        random.shuffle(points)
+
+        # 前から順番に決めて大きくしていく
+        ret = Circle(points[0], 0)
+        for i, p in enumerate(points):
+            if ret.contains(p):
+                continue
+            ret = Circle(p, 0)
+            for j, q in enumerate(points[:i]):
+                if ret.contains(q):
+                    continue
+                # 2点を直径とする円
+                ret = Circle((p + q) / 2, abs(p - q) / 2)
+                for k, r in enumerate(points[:j]):
+                    if ret.contains(r):
+                        continue
+                    # 3点に接する円
+                    ret = Circle.circumscribed_of(p, q, r)
         return ret
