@@ -3,7 +3,6 @@ class UnionFind:
         """
         size か nodes どっちか指定。
         nodes は set、size は list を使う。
-        set の最悪計算量は O(N) なので size 指定のほうが若干速い
         :param int size:
         :param collections.Iterable nodes:
         """
@@ -22,7 +21,6 @@ class UnionFind:
         x が属する木と y が属する木を併合
         :param x:
         :param y:
-        :return:
         """
         x = self.root(x)
         y = self.root(y)
@@ -45,7 +43,6 @@ class UnionFind:
         """
         x が属する木の root
         :param x:
-        :return:
         """
         if self._parents[x] == x:
             return x
@@ -56,7 +53,6 @@ class UnionFind:
         """
         x が属する木のノード数
         :param x:
-        :return:
         """
         return self._sizes[self.root(x)]
 
@@ -66,7 +62,6 @@ class WeightedUnionFind:
         """
         size か nodes どっちか指定。
         nodes は set、size は list を使う。
-        set の最悪計算量は O(N) なので size 指定のほうが若干速い
         :param int size:
         :param collections.Iterable nodes:
         """
@@ -90,7 +85,6 @@ class WeightedUnionFind:
         :param x:
         :param y:
         :param w: x と y の重みの差; (重み y) - (重み x)
-        :return:
         """
         rx = self.root(x)
         ry = self.root(y)
@@ -117,7 +111,6 @@ class WeightedUnionFind:
         """
         x が属する木の root
         :param x:
-        :return:
         """
         if self._parents[x] == x:
             return x
@@ -130,14 +123,12 @@ class WeightedUnionFind:
         """
         x が属する木のノード数
         :param x:
-        :return:
         """
         return self._sizes[self.root(x)]
 
     def weight(self, x):
         """
         :param x:
-        :return:
         """
         # 経路圧縮
         self.root(x)
@@ -148,7 +139,6 @@ class WeightedUnionFind:
         (y の重み) - (x の重み)
         :param x:
         :param y:
-        :return:
         """
         if self.root(x) == self.root(y):
             return self._weights[y] - self._weights[x]

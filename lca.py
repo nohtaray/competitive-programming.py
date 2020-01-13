@@ -49,6 +49,10 @@ class DoublingLCA:
                     self.parents[k + 1][v] = self.parents[k][self.parents[k][v]]
 
     def lca(self, u, v):
+        """
+        :param int u:
+        :param int v:
+        """
         # 深さを合わせる
         if self.depths[u] > self.depths[v]:
             u, v = v, u

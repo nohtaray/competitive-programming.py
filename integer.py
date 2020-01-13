@@ -46,13 +46,9 @@ def get_factors(n):
 def div_mod(a, b, mod):
     """
     (a // b) % mod
-    mod は 3 以上の素数を指定
-    フェルマーの小定理より mod p の世界で b^(p-1) は必ず 1 になるので
-    b の逆元 (b と掛けると 1 になる数) は b^(p-2)
     :param int a:
     :param int b:
     :param int mod:
-    :return:
     """
     return a * pow(b, mod - 2, mod) % mod
 
@@ -62,14 +58,12 @@ def mod_inv(a, mod):
     a の逆元
     :param int a:
     :param int mod:
-    :return:
     """
     return pow(a, mod - 2, mod)
 
 
 def ncr(n, r, mod=None):
     """
-    scipy.misc.comb または scipy.special.comb と同じ
     組み合わせの数 nCr
     :param int n:
     :param int r:
@@ -97,7 +91,6 @@ def nhr(n, r, mod=None):
     :param int n:
     :param int r:
     :param int mod:
-    :return:
     """
     return ncr(n + r - 1, r, mod)
 
@@ -109,7 +102,6 @@ def get_primes(max=None, count=None):
     https://qiita.com/Ishotihadus/items/73e107271275611f05f2
     :param int max:
     :param int count:
-    :return:
     """
     assert max or count
     if count:
