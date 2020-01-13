@@ -1,4 +1,48 @@
-from libs.series import get_factorials, factorial_invs
+def get_factorials(max, mod=None):
+    """
+    階乗 0!, 1!, 2!, ..., max!
+    :param int max:
+    :param int mod:
+    """
+    ret = [1]
+    n = 1
+    if mod:
+        for i in range(1, max + 1):
+            n *= i
+            n %= mod
+            ret.append(n)
+    else:
+        for i in range(1, max + 1):
+            n *= i
+            ret.append(n)
+    return ret
+
+
+def mod_invs(max, mod):
+    """
+    逆元 0, 1/1, 1/2, 1/3, ..., 1/max
+    :param int max:
+    :param int mod:
+    """
+    invs = [1] * (max + 1)
+    invs[0] = 0
+    for x in range(2, max + 1):
+        invs[x] = (-(mod // x) * invs[mod % x]) % mod
+    return invs
+
+
+def factorial_invs(max, mod):
+    """
+    階乗 0!, 1!, 2!, ..., max! の逆元
+    :param int max:
+    :param int mod:
+    """
+    ret = [1]
+    r = 1
+    for inv in mod_invs(max, mod)[1:]:
+        r = r * inv % mod
+        ret.append(r)
+    return ret
 
 
 class Combination:

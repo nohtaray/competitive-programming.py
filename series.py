@@ -28,66 +28,18 @@ def triangular_pyramid(n):
 
 
 def get_factorials(max, mod=None):
-    """
-    階乗 0!, 1!, 2!, ..., max!
-    :param int max:
-    :param int mod:
-    :return:
-    """
-    ret = [1]
-    n = 1
-    if mod:
-        for i in range(1, max + 1):
-            n *= i
-            n %= mod
-            ret.append(n)
-    else:
-        for i in range(1, max + 1):
-            n *= i
-            ret.append(n)
-    return ret
+    import libs.combination
+    return libs.combination.get_factorials(max=max, mod=mod)
 
 
 def mod_invs(max, mod):
-    """
-    逆元のリスト 0 から max まで
-    :param int max:
-    :param int mod:
-    """
-    invs = [1] * (max + 1)
-    for x in range(2, max + 1):
-        invs[x] = (-(mod // x) * invs[mod % x]) % mod
-    return invs
+    import libs.combination
+    return libs.combination.mod_invs(max=max, mod=mod)
 
 
 def factorial_invs(max, mod):
-    """
-    階乗 0!, 1!, 2!, ..., max! の逆元
-    :param int max:
-    :param int mod:
-    """
-    ret = []
-    r = 1
-    for inv in mod_invs(max, mod):
-        r = r * inv % mod
-        ret.append(r)
-    return ret
-
-
-def get_ncrs(n, mod):
-    """
-    nC_0, nC_1, nC_2, ..., nC_n までのリスト
-    :param n:
-    :param mod:
-    :return:
-    """
-    invs = mod_invs(n, mod)
-    ret = [1]
-    ncr = 1
-    for i in range(1, n + 1):
-        ncr = ((ncr * (n - i + 1) % mod) * invs[i]) % mod
-        ret.append(ncr)
-    return ret
+    import libs.combination
+    return libs.combination.factorial_invs(max=max, mod=mod)
 
 
 def get_powers(x, n, mod=None):
