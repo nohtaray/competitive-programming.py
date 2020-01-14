@@ -122,7 +122,7 @@ class Point:
             return Point.CCW_CLOCKWISE
         if b.dot(c) < -EPS:
             return Point.CCW_ONLINE_BACK
-        if c.norm() - b.norm() > EPS:
+        if b.dot(b - c) < -EPS:
             return Point.CCW_ONLINE_FRONT
         return Point.CCW_ON_SEGMENT
 
@@ -235,7 +235,7 @@ class Point:
         return abs((p - self).det(q - self)) < EPS and (p - self).dot(q - self) < EPS
 
     @staticmethod
-    def circumstance_of(p1, p2, p3):
+    def circumcenter_of(p1, p2, p3):
         """
         外心
         :param Point p1:
@@ -253,6 +253,20 @@ class Point:
         num = p1 * a * (b + c - a) + p2 * b * (c + a - b) + p3 * c * (a + b - c)
         den = a * (b + c - a) + b * (c + a - b) + c * (a + b - c)
         return num / den
+
+    @staticmethod
+    def incenter_of(p1, p2, p3):
+        """
+        内心
+        :param Point p1:
+        :param Point p2:
+        :param Point p3:
+        """
+        # https://ja.wikipedia.org/wiki/三角形の内接円と傍接円
+        d1 = p2.dist(p3)
+        d2 = p3.dist(p1)
+        d3 = p1.dist(p2)
+        return (p1 * d1 + p2 * d2 + p3 * d3) / (d1 + d2 + d3)
 
 
 class Line:
@@ -1037,7 +1051,7 @@ class Circle:
             return Circle((p1 + p3) / 2, p1.dist(p3) / 2)
         if p3.on_segment(p1, p2):
             return Circle((p1 + p2) / 2, p1.dist(p2) / 2)
-        o = Point.circumstance_of(p1, p2, p3)
+        o = Point.circumcenter_of(p1, p2, p3)
         return Circle(o, o.dist(p1))
 
     @staticmethod
