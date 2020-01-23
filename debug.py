@@ -167,5 +167,5 @@ def plot_graph(edges, directed=False, weighted=False):
         raise NotImplementedError()
     cls = nx.DiGraph if directed else nx.Graph
     G = nx.from_edgelist(edges, cls)
-    nx.draw(G)
+    nx.draw_networkx(G)
     plt.show()
