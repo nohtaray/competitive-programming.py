@@ -171,7 +171,11 @@ def plot_graph(edges, directed=False):
     if weighted:
         G.add_weighted_edges_from(edges)
         pos = nx.spring_layout(G)
-        nx.draw_networkx_edge_labels(G, pos)
+        labels = nx.draw_networkx_edge_labels(
+            G, pos, edge_labels={(v, u): w for v, u, w in edges})
+        for label in labels.values():
+            # ラベルの傾きを修正
+            label.set_rotation('horizontal')
         nx.draw_networkx(G, pos, with_labels=True, alpha=0.5)
     else:
         G.add_edges_from(edges)
