@@ -157,15 +157,24 @@ def generate_tree(V, directed=False):
         return generate_undirected_graph(V=V, E=V - 1)
 
 
-def plot_graph(edges, directed=False, weighted=False):
+def plot_graph(edges, directed=False):
     """
-    :param list of tuple edges:
+    :param typing.List[typing.Tuple[int]] edges: (from, to, [weight])
     :param bool directed:
-    :param bool weighted:
     """
-    if weighted:
-        raise NotImplementedError()
+    if not edges:
+        return
+    weighted = len(edges[0]) == 3
+
     cls = nx.DiGraph if directed else nx.Graph
-    G = nx.from_edgelist(edges, cls)
-    nx.draw_networkx(G)
+    G = cls()
+    if weighted:
+        G.add_weighted_edges_from(edges)
+        pos = nx.spring_layout(G)
+        nx.draw_networkx_edge_labels(G, pos)
+        nx.draw_networkx(G, pos, with_labels=True, alpha=0.5)
+    else:
+        G.add_edges_from(edges)
+        nx.draw_networkx(G, alpha=0.5)
+    plt.axis("off")
     plt.show()
