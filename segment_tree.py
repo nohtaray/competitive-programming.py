@@ -66,110 +66,211 @@ class SegmentTree:
         return self._size
 
 
-class LazySegmentTree:
-    # http://tsutaj.hatenablog.com/entry/2017/03/29/204841
-    def __init__(self, size, fn=operator.add, default=None, initial_values=None):
+class LazySegmentTreeAddMin:
+    # 区間 Add、区間 Min
+    # http://codeforces.com/blog/entry/18051
+    def __init__(self, values):
         """
-        :param int size:
-        :param callable fn: 区間に適用する関数。引数を 2 つ取る。min, max, operator.xor など
-        :param default:
-        :param list initial_values:
+        :param list values:
         """
-        default = default or 0
+        # Add の単位元
+        self._id = 0
+        self._size = len(values)
+        self._fn = min
 
-        # size 以上である最小の 2 冪を size とする
-        self._size = 1 << (size - 1).bit_length()
-        self._fn = fn
+        tree = [self._id] * self._size * 2
+        tree[self._size:] = values[:]
+        for i in reversed(range(1, self._size)):
+            tree[i] = self._fn(tree[i << 1], tree[i << 1 | 1])
+        self._tree = tree
+        self._delay = [self._id] * self._size * 2
 
-        self._lazy = [0] * (self._size * 2 - 1)
-        self._tree = [default] * (self._size * 2 - 1)
-        if initial_values:
-            i = self._size - 1
-            for v in initial_values:
-                self._tree[i] = v
-                i += 1
-            i = self._size - 2
-            while i >= 0:
-                self._tree[i] = self._fn(self._tree[i * 2 + 1], self._tree[i * 2 + 2])
-                i -= 1
+    def _add(self, p, value):
+        # p 以下の子どもたちに一様に value を加算する
+        # self._tree[p] は self._delay[p] を織り込み済み
+        self._tree[p] += value
+        if p < self._size:
+            self._delay[p] += value
 
-    def add(self, from_i, to_i, value, k=0, L=None, r=None):
+    def _update(self, p):
         """
-        [from_i, to_i) を、それぞれの値と value に fn を適用した値で更新する
-        :param int from_i:
-        :param int to_i:
-        :param int value:
-        :param int k: self._tree のインデックス
-        :param int L:
+        self._tree[p] の親たちを最新化する
+        :param int p:
+        """
+        while p > 1:
+            p >>= 1
+            self._tree[p] = self._fn(
+                self._tree[p << 1],
+                self._tree[p << 1 | 1],
+            ) + self._delay[p]
+
+    def _eval(self, p):
+        """
+        self._tree[p] に遅延配列から値を移す
+        :param int p:
+        """
+        # root から葉に向かって遅延配列を移していく
+        for h in reversed(range(1, p.bit_length())):
+            k = p >> h
+            self._add(k << 1, self._delay[k])
+            self._add(k << 1 | 1, self._delay[k])
+            self._delay[k] = self._id
+
+    def add(self, l, r, value):
+        """
+        [l, r) に value を加算する
+        :param int l:
         :param int r:
-        :return:
+        :param value:
         """
-        L = 0 if L is None else L
-        r = self._size if r is None else r
+        l += self._size
+        r += self._size
+        l0, r0 = l, r
+        while l < r:
+            if l & 1:
+                # 右側の子
+                self._add(l, value)
+                l += 1
+            if r & 1:
+                # 左側の子
+                r -= 1
+                self._add(r, value)
+            l >>= 1
+            r >>= 1
+        self._update(l0)
+        self._update(r0 - 1)
 
-        self._eval(k, L, r)
-
-        # 範囲外
-        if to_i <= L or r <= from_i:
-            return
-
-        if from_i <= L and r <= to_i:
-            # 完全に被覆してる
-            self._lazy[k] += (r - L) * value
-            self._eval(k, L, r)
-        else:
-            # 中途半端
-            self.add(from_i, to_i, value, k * 2 + 1, L, (L + r) // 2)
-            self.add(from_i, to_i, value, k * 2 + 2, (L + r) // 2, r)
-            self._tree[k] = self._fn(self._tree[k * 2 + 1], self._tree[k * 2 + 2])
-
-    def _eval(self, k, L, r):
+    def get(self, l, r=None):
         """
-        遅延配列の値を評価する
-        :param k:
-        :param L:
-        :param r:
+        [l, r) の Min
+        :param int l:
+        :param int|None r:
         """
-        if self._lazy[k] != 0:
-            # 本体を更新
-            self._tree[k] += self._lazy[k]
-            # 一番下じゃなければ伝播させる
-            if r - L > 1:
-                self._lazy[k * 2 + 1] += self._lazy[k] >> 1
-                self._lazy[k * 2 + 2] += self._lazy[k] >> 1
-            self._lazy[k] = 0
+        if r is None:
+            r = l + 1
+        ret_l = []
+        ret_r = []
+        l += self._size
+        r += self._size
+        self._eval(l)
+        self._eval(r - 1)
+        while l < r:
+            if l & 1:
+                ret_l.append(self._tree[l])
+                l += 1
+            if r & 1:
+                r -= 1
+                ret_r.append(self._tree[r])
+            l >>= 1
+            r >>= 1
+        return reduce(self._fn, ret_l + ret_r[::-1])
 
-    def get(self, from_i, to_i, k=0, L=None, r=None):
+
+class LazySegmentTreeAddSum:
+    # 区間 Add、区間 Sum
+    # http://codeforces.com/blog/entry/18051
+    def __init__(self, values):
         """
-        [from_i, to_i) に fn を適用した結果を返す
-        :param int from_i:
-        :param int to_i:
-        :param int k: self._tree[k] が、[L, r) に fn を適用した結果を持つ
-        :param int L:
+        :param list values:
+        """
+        # Add の単位元
+        self._id = 0
+        self._size = len(values)
+        self._fn = operator.add
+
+        tree = [self._id] * self._size * 2
+        tree[self._size:] = values[:]
+        for i in reversed(range(1, self._size)):
+            tree[i] = self._fn(tree[i << 1], tree[i << 1 | 1])
+        self._tree = tree
+        self._delay = [self._id] * self._size * 2
+
+        children = [0] * len(self._tree)
+        for i in range(self._size):
+            children[~i] = 1
+        for i in reversed(range(1, len(self._tree))):
+            children[i >> 1] += children[i]
+        self._children = children
+
+    def _add(self, p, value):
+        # p 以下の子どもたちに一様に value を加算する
+        # self._tree[p] は self._delay[p] を織り込み済み
+        self._tree[p] += value * self._children[p]
+        if p < self._size:
+            self._delay[p] += value
+
+    def _update(self, p):
+        """
+        self._tree[p] の親たちを最新化する
+        :param int p:
+        """
+        while p > 1:
+            p >>= 1
+            self._tree[p] = self._fn(
+                self._tree[p << 1],
+                self._tree[p << 1 | 1],
+            ) + self._delay[p] * self._children[p]
+
+    def _eval(self, p):
+        """
+        self._tree[p] に遅延配列から値を移す
+        :param int p:
+        """
+        # root から葉に向かって遅延配列を移していく
+        for h in reversed(range(1, p.bit_length())):
+            k = p >> h
+            self._add(k << 1, self._delay[k])
+            self._add(k << 1 | 1, self._delay[k])
+            self._delay[k] = self._id
+
+    def add(self, l, r, value):
+        """
+        [l, r) に value を加算する
+        :param int l:
         :param int r:
-        :return:
+        :param value:
         """
-        L = 0 if L is None else L
-        r = self._size if r is None else r
+        l += self._size
+        r += self._size
+        l0, r0 = l, r
+        while l < r:
+            if l & 1:
+                # 右側の子
+                self._add(l, value)
+                l += 1
+            if r & 1:
+                # 左側の子
+                r -= 1
+                self._add(r, value)
+            l >>= 1
+            r >>= 1
+        self._update(l0)
+        self._update(r0 - 1)
 
-        self._eval(k, L, r)
-
-        if from_i <= L and r <= to_i:
-            return self._tree[k]
-
-        if to_i <= L or r <= from_i:
-            return None
-
-        ret_L = self.get(from_i, to_i, k * 2 + 1, L, (L + r) // 2)
-        ret_r = self.get(from_i, to_i, k * 2 + 2, (L + r) // 2, r)
-        if ret_L is None:
-            return ret_r
-        if ret_r is None:
-            return ret_L
-        return self._fn(ret_L, ret_r)
-
-    def __len__(self):
-        return self._size
+    def get(self, l, r=None):
+        """
+        [l, r) の合計
+        :param int l:
+        :param int|None r:
+        """
+        if r is None:
+            r = l + 1
+        ret_l = []
+        ret_r = []
+        l += self._size
+        r += self._size
+        self._eval(l)
+        self._eval(r - 1)
+        while l < r:
+            if l & 1:
+                ret_l.append(self._tree[l])
+                l += 1
+            if r & 1:
+                r -= 1
+                ret_r.append(self._tree[r])
+            l >>= 1
+            r >>= 1
+        return reduce(self._fn, ret_l + ret_r[::-1])
 
 
 if __name__ == "__main__":
