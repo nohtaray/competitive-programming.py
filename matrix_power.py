@@ -18,20 +18,20 @@ def matrix_mul(m1, m2):
     return rows
 
 
-def matrix_power(matrix, n):
+def matrix_power(matrix, n, id_mat=None):
     """
     numpy.linalg.matrix_power と一緒
     :param list of list matrix:
     :param int n:
+    :param list of list id_mat: 単位行列
     :rtype: list of list
     """
-    eye = []
-    for i in range(len(matrix)):
-        row = [0] * len(matrix)
-        row[i] = 2 ** 32 - 1
-        eye.append(row)
+    assert n >= 0
+    if n == 0:
+        return id_mat
 
-    ret = eye
+    n -= 1
+    ret = matrix  # 必要ならコピーする
     while n > 0:
         if n & 1:
             ret = matrix_mul(ret, matrix)
