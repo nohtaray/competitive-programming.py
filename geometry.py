@@ -103,6 +103,19 @@ class Point:
     def __abs__(self):
         return abs(self.c)
 
+    # sort() に渡せるように適当に順序付けておく。x の小さい順、x が同じなら y の小さい順。
+    def __lt__(self, p):
+        return self.x - p.x < -EPS or self.x - p.x < EPS and self.y - p.y < -EPS
+
+    def __le__(self, p):
+        return self.x - p.x < -EPS or self.x - p.x < EPS and self.y - p.y < EPS
+
+    def __gt__(self, p):
+        return self.x - p.x > EPS or self.x - p.x > -EPS and self.y - p.y > EPS
+
+    def __ge__(self, p):
+        return self.x - p.x > EPS or self.x - p.x > -EPS and self.y - p.y > -EPS
+
     @staticmethod
     def ccw(a, b, c):
         """
