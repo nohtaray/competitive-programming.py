@@ -30,3 +30,25 @@ class RollingHash:
         if L >= r:
             return 0
         return (self._hashes[r] - self._hashes[L] * self._power[r - L]) % self._mod
+
+    def lcp(self, p, q, allow_overlap=False):
+        """
+        seq[p:] と seq[q:] の Longest Common Prefix の長さ
+        O(logN)
+        :param int p:
+        :param int q:
+        :param bool allow_overlap:
+        """
+        lim = min(len(self._seq) - p, len(self._seq) - q)
+        if not allow_overlap:
+            lim = min(lim, abs(p - q))
+
+        ok = 0
+        ng = lim + 1
+        while abs(ng - ok) > 1:
+            sz = (ok + ng) // 2
+            if self.get(p, p + sz) == self.get(q, q + sz):
+                ok = sz
+            else:
+                ng = sz
+        return ok
