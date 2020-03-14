@@ -62,6 +62,12 @@ class SegmentTree:
             r >>= 1
         return reduce(self._op, ret_l + ret_r)
 
+    def get_values_copy(self):
+        """
+        O(N) で全部の値を取得
+        """
+        return self._tree[self._size:]
+
     def __len__(self):
         return self._size
 
