@@ -103,7 +103,7 @@ def get_primes(max=None, count=None):
     :param int max:
     :param int count:
     """
-    assert max or count
+    assert max is not None or count is not None
     if count:
         raise NotImplementedError()
     if max <= 1:
