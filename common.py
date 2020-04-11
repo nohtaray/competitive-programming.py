@@ -9,12 +9,12 @@ import random
 import re
 import string
 import sys
-from collections import Counter, deque, defaultdict
+from collections import Counter, defaultdict, deque
 from copy import deepcopy
 from decimal import Decimal
 from functools import lru_cache, reduce
 from math import gcd
-from operator import itemgetter, mul, add, xor
+from operator import add, itemgetter, mul, xor
 
 import numpy as np
 
