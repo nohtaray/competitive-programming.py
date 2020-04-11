@@ -12,8 +12,8 @@ import sys
 from collections import Counter, deque, defaultdict
 from copy import deepcopy
 from decimal import Decimal
-from fractions import gcd
 from functools import lru_cache, reduce
+from math import gcd
 from operator import itemgetter, mul, add, xor
 
 import numpy as np
