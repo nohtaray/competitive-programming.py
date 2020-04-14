@@ -1,6 +1,7 @@
 import functools
 import os
 import random
+import time
 
 import matplotlib.patches as pat
 import matplotlib.pyplot as plt
@@ -15,18 +16,18 @@ def debug(fn):
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
+        st = time.perf_counter()
         ret = fn(*args, **kwargs)
-        print(
-            "DEBUG: {}({}) -> ".format(
-                fn.__name__,
-                ", ".join(
-                    list(map(str, args))
-                    + ["{}={}".format(k, str(v)) for k, v in kwargs.items()]
-                ),
+        t = time.perf_counter() - st
+        print("DEBUG [{:4d} ms]: {}({}) -> {}".format(
+            int(t * 1000),
+            fn.__name__,
+            ", ".join(
+                list(map(str, args))
+                + ["{}={}".format(k, str(v)) for k, v in kwargs.items()]
             ),
-            end="",
-        )
-        print(ret)
+            ret
+        ))
         return ret
 
     return wrapper
