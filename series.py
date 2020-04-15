@@ -30,3 +30,21 @@ def get_powers(x, n, mod=None):
         return list(itertools.accumulate([1] * n, lambda p, _: p * x % mod))
     else:
         return list(itertools.accumulate([1] * n, lambda p, _: p * x))
+
+
+def get_derangements(max, mod):
+    """
+    0 ... max までの攪乱順列
+    整数 1, 2, 3, …, n を要素とする順列において、i 番目 (i ≤ n) が i でない順列。
+    1, 0, 1, 2, 9, 44, 265, 1854, 14833, 133496, ...
+    https://ja.wikipedia.org/wiki/完全順列
+    https://oeis.org/A000166
+    :param int max:
+    :param int mod:
+    """
+    dp = [0] * (max + 1)
+    dp[0] = 1
+    dp[1] = 0
+    for i in range(2, len(dp)):
+        dp[i] = (dp[i - 1] + dp[i - 2]) * (i - 1) % mod
+    return dp[:max + 1]
