@@ -1,7 +1,5 @@
 import heapq
 
-import scipy.sparse.csgraph
-
 
 def bellman_ford(graph, from_v, to_v):
     """
@@ -143,3 +141,43 @@ def topological_sort(graph):
         raise ValueError('閉路があります')
 
     return ret
+
+
+def enumerate_bridges(graph):
+    """
+    橋を列挙する
+    http://nupioca.hatenadiary.jp/entry/2013/11/03/200006
+    Verify: https://atcoder.jp/contests/abc075/submissions/12488523
+    :param list of (list of int) graph:
+    """
+    N = len(graph)
+    ret_bridges = []
+    pres = [-1] * N
+    lows = [-1] * N
+    order = -1
+    for v in range(N):
+        if pres[v] >= 0:
+            continue
+        edges = [(None, v, True)]
+        while edges:
+            v, u, forward = edges.pop()
+            if forward:
+                if pres[u] >= 0:
+                    # もう来たことがある
+                    lows[v] = min(lows[v], lows[u])
+                    continue
+                edges.append((v, u, False))
+                parent, v = v, u
+                order += 1
+                pres[v] = lows[v] = order
+                for u in graph[v]:
+                    if u == parent:
+                        continue
+                    edges.append((v, u, True))
+            else:
+                if v is None:
+                    continue
+                if lows[u] == pres[u]:
+                    ret_bridges.append((v, u))
+                lows[v] = min(lows[v], lows[u])
+    return ret_bridges
