@@ -1,8 +1,9 @@
 import functools
 import os
 import random
-import time
+from copy import deepcopy
 
+import time
 import matplotlib.patches as pat
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -16,15 +17,16 @@ def debug(fn):
 
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        st = time.perf_counter()
+        start_time = time.perf_counter()
+        kwargs_cp = deepcopy(kwargs)
         ret = fn(*args, **kwargs)
-        t = time.perf_counter() - st
+        elapsed_ms = (time.perf_counter() - start_time) * 1000
         print("DEBUG [{:4d} ms]: {}({}) -> {}".format(
-            int(t * 1000),
+            int(elapsed_ms),
             fn.__name__,
             ", ".join(
                 list(map(str, args))
-                + ["{}={}".format(k, str(v)) for k, v in kwargs.items()]
+                + ["{}={}".format(k, str(v)) for k, v in kwargs_cp.items()]
             ),
             ret
         ))
