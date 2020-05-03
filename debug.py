@@ -3,10 +3,12 @@ import os
 import random
 from copy import deepcopy
 
+import sys
 import time
 import matplotlib.patches as pat
 import matplotlib.pyplot as plt
 import networkx as nx
+from decorator import contextmanager
 
 import libs.geometry as geo
 
@@ -33,6 +35,14 @@ def debug(fn):
         return ret
 
     return wrapper
+
+
+@contextmanager
+def timer(name):
+    st = time.perf_counter()
+    yield
+    t = int((time.perf_counter() - st) * 1000)
+    print(f'[{name}] {t:4d} ms', file=sys.stderr)
 
 
 def plot_figure(*figures):
