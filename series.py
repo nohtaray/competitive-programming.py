@@ -32,10 +32,10 @@ def get_powers(x, n, mod=None):
         return list(itertools.accumulate([1] * n, lambda p, _: p * x))
 
 
-def get_derangements(max, mod):
+def get_montmort_numbers(max, mod):
     """
-    0 ... max までの攪乱順列
-    整数 1, 2, 3, …, n を要素とする順列において、i 番目 (i ≤ n) が i でない順列。
+    0 ... max までのモンモール数
+    整数 1, 2, 3, …, n を要素とする順列において、i 番目 (i ≤ n) が i でない順列 (完全順列, 攪乱順列) の個数。
     1, 0, 1, 2, 9, 44, 265, 1854, 14833, 133496, ...
     https://ja.wikipedia.org/wiki/完全順列
     https://oeis.org/A000166
