@@ -6,7 +6,7 @@ from collections import defaultdict
 
 INF = float("inf")
 PI = cmath.pi
-TAU = cmath.tau
+TAU = cmath.pi * 2
 EPS = 1e-10
 
 
