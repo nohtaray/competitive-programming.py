@@ -6,7 +6,7 @@ from collections import defaultdict
 
 INF = float("inf")
 PI = cmath.pi
-TAU = cmath.pi * 2
+TAU = cmath.tau
 EPS = 1e-10
 
 
@@ -195,6 +195,14 @@ class Point:
         :rtype: float
         """
         return abs((p - self).det(q - self) / 2)
+
+    def rotate(self, theta):
+        """
+        反時計回りに theta だけ回転させた Point を返す
+        :param float theta:
+        """
+        c = self.c * cmath.rect(1, theta)
+        return Point(c.real, c.imag)
 
     def projection_point(self, p, q, allow_outer=False):
         """
