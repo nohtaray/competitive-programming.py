@@ -73,11 +73,12 @@ def plot_figure(*figures):
     plt.show()
 
 
-def generate_undirected_graph(V, E):
+def generate_undirected_graph(V, E, origin=1):
     """
     V 頂点 E 辺の単純連結無向グラフ
     :param int V:
     :param int E:
+    :param int origin:
     :rtype: list of (int, int)
     """
     if E < V - 1:
@@ -102,14 +103,18 @@ def generate_undirected_graph(V, E):
                 continue
             G.add_edge(v, u)
             cnt += 1
-    return list(G.edges())
+    ret = []
+    for v, u in G.edges():
+        ret.append((v + origin, u + origin))
+    return ret
 
 
-def generate_directed_graph(V, E):
+def generate_directed_graph(V, E, origin=1):
     """
     V 頂点 E 辺の単純連結有向グラフ
     :param int V:
     :param int E:
+    :param int origin:
     :rtype: list of (int, int)
     """
     if E < V - 1:
@@ -139,35 +144,40 @@ def generate_directed_graph(V, E):
                 continue
             G.add_edge(v, u)
             cnt += 1
-    return list(G.edges())
+    ret = []
+    for v, u in G.edges():
+        ret.append((v + origin, u + origin))
+    return ret
 
 
-def generate_oriented_graph(V, E):
+def generate_oriented_graph(V, E, origin=1):
     """
     両方向の辺がある頂点対を持たない有向グラフを生成
     https://en.wikipedia.org/wiki/Directed_graph#Types_of_directed_graphs
     :param int V:
     :param int E:
+    :param int origin:
     :rtype: list of (int, int)
     """
     ret = []
-    for v, u in generate_undirected_graph(V, E):
+    for v, u in generate_undirected_graph(V, E, origin=origin):
         if random.randint(0, 1):
             v, u = u, v
         ret.append((v, u))
     return ret
 
 
-def generate_tree(V, directed=False):
+def generate_tree(V, directed=False, origin=1):
     """
     V 頂点の木を生成する
     :param int V:
     :param bool directed:
+    :param int origin:
     """
     if directed:
-        return generate_directed_graph(V=V, E=V - 1)
+        return generate_directed_graph(V=V, E=V - 1, origin=origin)
     else:
-        return generate_undirected_graph(V=V, E=V - 1)
+        return generate_undirected_graph(V=V, E=V - 1, origin=origin)
 
 
 def plot_graph(edges, directed=False):
