@@ -181,3 +181,64 @@ def enumerate_bridges(graph):
                     ret_bridges.append((v, u))
                 lows[v] = min(lows[v], lows[u])
     return ret_bridges
+
+
+def strongly_connected_components(graph):
+    """
+    強連結成分分解; SCC
+    ret[v]: v のコンポーネント番号
+    コンポーネント番号はトポロジカル順で前にある方が小さい
+    Verify: https://atcoder.jp/contests/arc030/submissions/14035565
+    Verify: http://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=4553151#1
+    :param list of (list of int) graph:
+    :rtype: list of int
+    """
+    N = len(graph)
+
+    rev_graph = [[] for _ in range(N)]
+    for v in range(N):
+        for u in graph[v]:
+            rev_graph[u].append(v)
+
+    # 帰りがけ順
+    pre_order = []
+    seen = [False] * N
+    for v in range(N):
+        if seen[v]:
+            continue
+        seen[v] = True
+        stack = [(v, 0)]
+        while stack:
+            v, pos = stack.pop()
+            for i in range(pos, len(graph[v])):
+                u = graph[v][i]
+                if seen[u]:
+                    continue
+                seen[u] = True
+                # 中断して次の頂点を Stack に詰む
+                stack.append((v, i + 1))
+                stack.append((u, 0))
+                break
+            else:
+                # 帰りがけ
+                pre_order.append(v)
+
+    # 帰りがけ順が遅い順に DFS
+    cid = 0
+    ret = [-1] * N
+    seen = [False] * N
+    for v in reversed(pre_order):
+        if seen[v]:
+            continue
+        seen[v] = True
+        stack = [v]
+        while stack:
+            v = stack.pop()
+            ret[v] = cid
+            for u in rev_graph[v]:
+                if seen[u]:
+                    continue
+                seen[u] = True
+                stack.append(u)
+        cid += 1
+    return ret
