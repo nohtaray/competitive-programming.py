@@ -52,3 +52,25 @@ class RollingHash:
             else:
                 ng = sz
         return ok
+
+    def lcs(self, p, q, allow_overlap=False):
+        """
+        seq[:p] と seq[:q] の Longest Common Suffix の長さ
+        O(logN)
+        :param int p:
+        :param int q:
+        :param bool allow_overlap:
+        """
+        lim = min(p, q)
+        if not allow_overlap:
+            lim = min(lim, abs(p - q))
+
+        ok = 0
+        ng = lim + 1
+        while abs(ng - ok) > 1:
+            sz = (ok + ng) // 2
+            if self.get(p - sz, p) == self.get(q - sz, q):
+                ok = sz
+            else:
+                ng = sz
+        return ok
