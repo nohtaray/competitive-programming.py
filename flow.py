@@ -1,5 +1,5 @@
 import heapq
-from collections import deque, defaultdict
+from collections import defaultdict, deque
 
 
 class Dinic:
@@ -445,3 +445,18 @@ class PrimalDual:
             remains -= flow
             total_cost += flow * h[to_v]
         return total_cost
+
+
+def hungarian(mat):
+    """
+    各行・各列から 1 要素ずつ選んでコストが最小となるときの行番号・列番号
+    ハンガリアン法 O(N^3)
+    https://en.wikipedia.org/wiki/Hungarian_algorithm
+    :param list of (list of int) mat:
+    :rtype: list of int, list of int
+    """
+    import numpy as np
+    from scipy.optimize import linear_sum_assignment
+
+    rows, cols = linear_sum_assignment(np.array(mat, dtype=int))
+    return list(rows), list(cols)
