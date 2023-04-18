@@ -281,46 +281,49 @@ class LazySegmentTreeAddSum:
         return reduce(self._fn, ret_l + ret_r[::-1])
 
 
+E = typing.TypeVar('E')
 T = typing.TypeVar('T')
-S = typing.TypeVar('S')
 
 
-class LazySegmentTree(typing.Generic[T, S]):
+class LazySegmentTree(typing.Generic[E, T]):
     # 抽象化版。20% ぐらいおそくなるから可能なら上のを使う
-    # Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_2_H
-    def __init__(self, values: typing.List[T],
+    # Verify できてない、get するかしないかで値が変わることがある
+    # C++ のやつを参考に書き直したほうがいいかも
+    def __init__(self, values: typing.List[E],
+                 e_id: E,
                  t_id: T,
-                 s_id: S,
-                 fn1: typing.Callable[[T, T], T],
-                 fn2: typing.Callable[[T, S], T],
-                 fn3: typing.Callable[[S, S], S],
-                 fn4: typing.Callable[[S, int], S] = lambda s, n: s):
+                 fn1: typing.Callable[[E, E], E],
+                 fn2: typing.Callable[[E, T], E],
+                 fn3: typing.Callable[[T, T], T],
+                 fn4: typing.Callable[[T, int], T] = lambda t, n: t):
         """
-        T: values の型
-        S: 範囲に適用したい値の型
+        E: values の型
+        T: 範囲に適用したい値の型
         :param values:
+        :param e_id: E の単位元
         :param t_id: T の単位元
-        :param s_id: S の単位元
-        :param fn1: (T, T) -> T
-        :param fn2: (T, S) -> T
-        :param fn3: (S, S) -> S
-        :param fn4: (S, int) -> S: fn2(fn2(fn2(T, S))) を fn2(T, fn4(S, 3)) みたいにするやつ
+        :param fn1: (E, E) -> E
+        :param fn2: (E, T) -> E
+        :param fn3: (T, T) -> T
+        :param fn4: (T, int) -> T:
+            (E_1・T)・(E_2・T)・...・(E_k・T) == (E_1・E_2・...・E_k)・_t_pow(T, k) を満たすような _t_pow
+            区間加算のとき、RSQ なら掛け算、RMQ なら T をそのまま返す関数
         """
         self._size = len(values)
         self._fn1 = fn1
         self._fn2 = fn2
         self._fn3 = fn3
         self._fn4 = fn4
+        self._e_id = e_id
         self._t_id = t_id
-        self._s_id = s_id
 
-        tree = [self._t_id] * self._size * 2
+        tree = [self._e_id] * self._size * 2
         tree[self._size:] = values[:]
         for i in reversed(range(1, self._size)):
             tree[i] = self._fn1(tree[i << 1], tree[i << 1 | 1])
 
-        self._tree = tree  # type: typing.List[T]
-        self._delay = [self._s_id] * self._size * 2  # type: typing.List[S]
+        self._tree = tree  # type: typing.List[E]
+        self._delay = [self._t_id] * self._size * 2  # type: typing.List[T]
 
         children = [0] * len(self._tree)
         for i in range(self._size):
@@ -365,7 +368,7 @@ class LazySegmentTree(typing.Generic[T, S]):
             k = p >> h
             self._add(k << 1, self._delay[k])
             self._add(k << 1 | 1, self._delay[k])
-            self._delay[k] = self._s_id
+            self._delay[k] = self._t_id
 
     def add(self, l, r, value):
         """
@@ -414,7 +417,7 @@ class LazySegmentTree(typing.Generic[T, S]):
                 ret_r.append(self._tree[r])
             l >>= 1
             r >>= 1
-        return reduce(self._fn1, ret_l + ret_r[::-1], self._t_id)
+        return reduce(self._fn1, ret_l + ret_r[::-1], self._e_id)
 
 
 if __name__ == "__main__":
@@ -439,7 +442,7 @@ if __name__ == "__main__":
 
     # Test LazySegmentTreeAddMin
     st1 = LazySegmentTreeAddMin(values)
-    st2 = LazySegmentTree(values, fn1=min, fn2=operator.add, fn3=operator.add, t_id=float('inf'), s_id=0)
+    st2 = LazySegmentTree(values, fn1=min, fn2=operator.add, fn3=operator.add, e_id=float('inf'), t_id=0)
     test = np.array(values, dtype=int)
     i = 0
     for l, r in itertools.combinations_with_replacement(range(len(values)), r=2):
@@ -454,7 +457,7 @@ if __name__ == "__main__":
     # Test LazySegmentTreeAddSum
     st1 = LazySegmentTreeAddSum(values)
     st2 = LazySegmentTree(values, fn1=operator.add, fn2=operator.add, fn3=operator.add, fn4=operator.mul,
-                          t_id=0, s_id=0)
+                          e_id=0, t_id=0)
     test = np.array(values, dtype=int)
     i = 0
     for l, r in itertools.combinations_with_replacement(range(len(values)), r=2):

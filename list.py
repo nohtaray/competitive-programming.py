@@ -1,5 +1,7 @@
 from collections import Counter, defaultdict
 
+import itertools
+
 from libs.integer import get_factors
 
 
@@ -41,6 +43,24 @@ def cumsum(it):
     for v in it:
         cs += v
         ret.append(cs)
+    return ret
+
+
+def cumsum2(arr):
+    H = len(arr)
+    W = len(arr[0])
+    ret = [[0] * (W + 1) for _ in range(H + 1)]
+    for h, w in itertools.product(range(H), range(W)):
+        ret[h + 1][w + 1] = ret[h][w + 1] + ret[h + 1][w] - ret[h][w] + arr[h][w]
+    return ret
+
+
+def cummax2(arr):
+    H = len(arr)
+    W = len(arr[0])
+    ret = [[-float('inf')] * (W + 1) for _ in range(H + 1)]
+    for h, w in itertools.product(range(H), range(W)):
+        ret[h + 1][w + 1] = max(ret[h][w + 1], ret[h + 1][w], arr[h][w])
     return ret
 
 
