@@ -1,7 +1,10 @@
 class RollingHash:
     # Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_14_B
-    def __init__(self, seq, base=10 ** 9 + 7, mod=2 ** 89 - 1):
+    def __init__(self, seq, base=37, mod=10 ** 9 + 9):
         """
+        mod は (2<<61)-1 とかがいいらしいです
+        64bit を超えるとハッシュの構築だけで死ぬほど重くなるからできれば避けたい
+        https://atcoder.jp/contests/abc284/submissions/41589904
         :param str|typing.Sequence[int] seq:
         :param int base:
         :param int mod:
@@ -74,3 +77,12 @@ class RollingHash:
             else:
                 ng = sz
         return ok
+
+    def concat(self, s1, s2, s2_len):
+        """
+        ハッシュ 2 つを結合する
+        :param s1:
+        :param s2:
+        :param s2_len
+        """
+        return (s1 * self._power[s2_len] + s2) % self._mod
