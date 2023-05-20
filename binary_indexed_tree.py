@@ -23,11 +23,38 @@ class BinaryIndexedTree:
         [0, i) の合計
         :param int i:
         """
+        if i <= 0:
+            return 0
         ret = 0
         while i > 0:
             ret += self._bit[i - 1]
             i -= i & -i
         return ret
+
+    def lower_bound(self, w):
+        """
+        合計が w 以上となるインデックス
+        add に渡したときに w 以上の値が返ってくる最小の値 - 1
+        bit.sum(x + 1) = a_0 + a_1 + a_2 + ... + a_x >= w となる x
+        ※マイナスの要素がないこと
+        w <= bit[0] のとき、0
+        w == bit.sum(len(bit)) のとき、len(bit) - 1
+        w > bit.sum(len(bit)) のとき、len(bit)
+        https://algo-logic.info/binary-indexed-tree/
+        :param w:
+        """
+        if w <= 0:
+            return 0
+        x = 0
+        length = 1
+        while length < self._size:
+            length <<= 1
+        while length > 0:
+            if x + length - 1 < self._size and self._bit[x + length - 1] < w:
+                w -= self._bit[x + length - 1]
+                x += length
+            length >>= 1
+        return x
 
     def __len__(self):
         return self._size
@@ -64,3 +91,42 @@ def count_inversions(li, max=None):
         ret += i - bit.sum(li[i])
         bit.add(li[i], 1)
     return ret
+
+
+class OrderedSet:
+    def __init__(self, numbers):
+        """
+        :param numbers:
+        """
+        numbers = list(sorted(set(numbers)))
+        indices = dict()
+        for n, cn in zip(numbers, compress(numbers)):
+            indices[n] = cn
+
+        self._numbers = numbers
+        self._indices = indices
+        self._bit = BinaryIndexedTree(len(numbers))
+        self._set = set()
+
+    def __contains__(self, item):
+        return item in self._set
+
+    def add(self, item):
+        if item not in self._set:
+            i = self._indices[item]
+            self._bit.add(i, 1)
+            self._set.add(item)
+
+    def remove(self, item):
+        if item in self._set:
+            i = self._indices[item]
+            self._bit.add(i, -1)
+            self._set.remove(item)
+
+    def lower_bound(self, item):
+        # TODO: 実装
+        pass
+
+    def upper_bound(self, item):
+        # TODO: 実装
+        pass
