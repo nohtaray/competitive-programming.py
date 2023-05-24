@@ -122,3 +122,13 @@ def get_primes(max=None, count=None):
             p += 2
 
     return primes
+
+
+def pow_pow(a, b, c, mod):
+    """
+    (a^(b^c)) % mod
+    mod は素数
+    """
+    if a % mod == 0:
+        return 0
+    return pow(a, pow(b, c, mod - 1), mod)
