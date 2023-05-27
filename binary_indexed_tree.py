@@ -18,6 +18,12 @@ class BinaryIndexedTree:
             self._bit[x - 1] += w
             x += x & -x
 
+    def get(self, i):
+        return self.sum(i + 1) - self.sum(i)
+
+    def set(self, i, v):
+        self.add(self.sum(i - 1) - self.sum(i) + v)
+
     def sum(self, i):
         """
         [0, i) の合計

@@ -96,3 +96,4 @@ if __name__ == "__main__":
     assert cummax(li) == [3, 3, 4, 4, 5, 9, 9, 9]
     assert cummin(li) == [3, 1, 1, 1, 1, 1, 1, 1]
     assert cumsum(li) == [3, 4, 8, 9, 14, 23, 25, 31]
+    assert argsort([3, 1, 2]) == [1, 2, 0]
