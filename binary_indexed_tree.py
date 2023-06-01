@@ -77,24 +77,18 @@ def compress(li, origin=0):
     return ret
 
 
-def count_inversions(li, max=None):
+def count_inversions(li, compress_values=False):
     """
     リストから転倒数 (li[i] > li[w] (i < w) となる (i, w) の組み合わせ数) を返す
     バブルソートするときに反転する必要がある数。
-    :param numpy.ndarray | list of int li:
-            すべての要素が 0 以上の int である配列。
-            BIT を使うので、マイナスを含んだり最大値が大きい場合は np.argsort の結果を指定
-            ただしリストに重複を含む場合は np.argsort は unstable なので別の方法使うこと
-            https://docs.scipy.org/doc/numpy/reference/generated/numpy.sort.html
-    :param int max: li の最大値。わかる場合は指定
     :rtype: int
     """
-    if not max:
-        max = __builtins__.max(li)
-    bit = BinaryIndexedTree(size=max + 1)
+    if compress_values:
+        li = compress(li)
+    bit = BinaryIndexedTree(size=max(li) + 1)
     ret = 0
     for i in range(len(li)):
-        ret += i - bit.sum(li[i])
+        ret += i - bit.sum(li[i] + 1)
         bit.add(li[i], 1)
     return ret
 

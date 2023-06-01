@@ -65,6 +65,14 @@ class Combination:
             return 0
         return self._factorials[n] * self._finvs[r] % self._mod * self._finvs[n - r] % self._mod
 
+    def nhr(self, n, r):
+        """
+        :param n:
+        :param r:
+        :rtype: int
+        """
+        return self.ncr(n + r - 1, r)
+
 
 if __name__ == '__main__':
     assert Combination(5, 10 ** 9 + 7).ncr(5, 3) == 10
