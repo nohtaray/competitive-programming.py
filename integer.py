@@ -132,3 +132,22 @@ def pow_pow(a, b, c, mod):
     if a % mod == 0:
         return 0
     return pow(a, pow(b, c, mod - 1), mod)
+
+
+def extgcd(a, b):
+    """
+    extgcd(a, b): ax + by = gcd(a, b) となる整数 x, y を返す
+    https://qiita.com/drken/items/b97ff231e43bce50199a#3-4-拡張ユークリッドの互除法のアルゴリズム的記述
+    負の値を渡しても OK
+    verify: https://atcoder.jp/contests/abc340/submissions/59184365
+    :param int a:
+    :param int b:
+    :return: (gcd(a, b), x, y)
+    """
+    if b == 0:
+        return a, 1, 0
+    # a = qb + r
+    q = a // b
+    r = a % b
+    d, x, y = extgcd(b, r)
+    return d, y, x - q * y

@@ -109,6 +109,21 @@ def generate_undirected_graph(V, E, origin=1):
     return ret
 
 
+def generate_undirected_weighted_graph(V, E, max_weight, origin=1):
+    """
+    V 頂点 E 辺の重み付き単純連結無向グラフ
+    :param int V:
+    :param int E:
+    :param int max_weight:
+    :param int origin:
+    :rtype: list of (int, int, int)
+    """
+    ret = []
+    for a, b in generate_undirected_graph(V, E, origin=origin):
+        ret.append((a, b, random.randint(1, max_weight)))
+    return ret
+
+
 def generate_directed_graph(V, E, origin=1):
     """
     V 頂点 E 辺の単純連結有向グラフ
