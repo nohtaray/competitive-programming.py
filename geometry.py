@@ -303,6 +303,13 @@ class Line:
         self.b = b
         self.c = c
 
+    def __repr__(self):
+        # return "{}x + {}y + {} = 0".format(self.a, self.b, self.c)
+        return "y = {}x + {}".format(self.gradient, self.intercept)
+
+    def __eq__(self, p):
+        return abs(self.gradient - p.gradient) < EPS and abs(self.intercept - p.intercept) < EPS
+
     @staticmethod
     def from_gradient(grad: float, intercept: float):
         """

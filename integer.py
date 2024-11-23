@@ -73,6 +73,11 @@ def ncr(n, r, mod=None):
     if n < r:
         return 0
 
+    # n が 10**6 * 2 のときに TLE した
+    # https://atcoder.jp/contests/agc051/submissions/60117826
+    # 覚えたら関数ごと消す
+    raise "遅いので combination.py を使ってください"
+
     # 何度も呼ぶ場合は combination.py をつかう
     r = min(n - r, r)
     if r == 0:
