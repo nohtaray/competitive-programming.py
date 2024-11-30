@@ -156,3 +156,31 @@ def extgcd(a, b):
     r = a % b
     d, x, y = extgcd(b, r)
     return d, y, x - q * y
+
+
+def find_integer_solutions(a, b, c, k=0):
+    """
+    不定方程式 ax + by = c の整数解を求める
+    :param int a:
+    :param int b:
+    :param int c:
+    :param int k:
+    :rtype: None|(int,int)
+    """
+    # 最大公約数を求める
+    g = math.gcd(a, b)
+
+    # c が gcd(a, b) で割り切れない場合、解は存在しない
+    if c % g != 0:
+        return None
+
+    # a と b を gcd で割り、簡約化
+    a, b, c = a // g, b // g, c // g
+    _, x0, y0 = extgcd(a, b)
+    x0 *= c
+    y0 *= c
+
+    # k はなんでもいい
+    x = x0 + k * b
+    y = y0 - k * a
+    return x, y
