@@ -12,7 +12,7 @@ import sys
 from collections import Counter, defaultdict, deque
 from copy import deepcopy
 from decimal import Decimal
-from functools import cache, reduce
+from functools import cache, reduce, cmp_to_key
 from math import gcd
 from operator import add, itemgetter, mul, xor
 

@@ -1,3 +1,4 @@
+import _bisect as bisect
 import itertools
 
 
@@ -38,3 +39,19 @@ class LongestCommonSubsequence:
             else:
                 dp[i + 1][j + 1] = max(dp[i][j + 1], dp[i + 1][j])
         return dp[len(self._s)][len(self._t)]
+
+    def get_count_of_permutation(self):
+        """
+        t に重複がないとき専用
+        O(|s|log|t|)
+        Verify: https://atcoder.jp/contests/arc189/submissions/61026429
+        :rtype: int
+        """
+        inf = len(self._t)
+        # s を t 上の位置に変換すると LIS になる
+        pos = {c: i for i, c in enumerate(self._t)}
+        sp = [pos[c] if c in pos else inf for c in self._s]
+        dp = [inf] * (len(sp) + 1)
+        for c in sp:
+            dp[bisect.bisect_left(dp, c)] = c
+        return bisect.bisect_left(dp, inf)
