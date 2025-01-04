@@ -13,8 +13,22 @@ from collections import Counter, defaultdict, deque
 from copy import deepcopy
 from decimal import Decimal
 from functools import cache, reduce, cmp_to_key
+from itertools import accumulate
 from math import gcd
 from operator import add, itemgetter, mul, xor
+
+import atcoder.convolution
+import atcoder.dsu
+import atcoder.fenwicktree
+import atcoder.lazysegtree
+import atcoder.math
+import atcoder.maxflow
+import atcoder.mincostflow
+import atcoder.modint
+import atcoder.scc
+import atcoder.segtree
+import atcoder.string
+import atcoder.twosat
 
 import numpy as np
 

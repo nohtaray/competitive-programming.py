@@ -55,6 +55,16 @@ class Combination:
         self._finvs = factorial_invs(max, mod)
         self._mod = mod
 
+    def npr(self, n, r):
+        """
+        :param int n:
+        :param int r:
+        :rtype: int
+        """
+        if n < r:
+            return 0
+        return self._factorials[n] * self._finvs[n - r] % self._mod
+
     def ncr(self, n, r):
         """
         :param int n:
