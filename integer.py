@@ -46,20 +46,33 @@ def get_factors(n):
 def div_mod(a, b, mod):
     """
     (a // b) % mod
+    b と mod は互いに素であること
     :param int a:
     :param int b:
     :param int mod:
     """
-    return a * pow(b, mod - 2, mod) % mod
+    return a * mod_inv(b, mod) % mod
 
 
 def mod_inv(a, mod):
     """
     a の逆元
-    :param int a:
-    :param int mod:
+    mod は a と互いに素であること
+    :param a:
+    :param mod:
+    :return:
     """
-    return pow(a, mod - 2, mod)
+    b = mod
+    u = 1
+    v = 0
+    while b:
+        t = a // b
+        a -= t * b
+        a, b = b, a
+        u -= t * v
+        u, v = v, u
+    u %= mod
+    return u
 
 
 def ncr(n, r, mod=None):
@@ -184,3 +197,46 @@ def find_integer_solutions(a, b, c, k=0):
     x = x0 + k * b
     y = y0 - k * a
     return x, y
+
+
+def mod_log(x, base, mod, allow_zero=True):
+    """
+    log_{base}(x) % mod
+    x == {base}^{ret} % mod
+    https://qiita.com/drken/items/3b4fdf0a78e7a138cd9a#6-離散対数-log_a-x
+    BSGS; baby-step giant-step
+    https://atcoder.jp/contests/arc042/submissions/14086715
+    :param x:
+    :param base:
+    :param mod:
+    :param bool allow_zero:
+    """
+    if not 0 < x < mod:
+        return None
+    if allow_zero and x == 1:
+        return 0
+    base %= mod
+    sqrt_mod = int(math.sqrt(mod)) + 1
+    # ret = p * sqrt(mod) + r
+    # a_r[z]: base^r == z となる最小の r
+    a_r = {}
+    z = 1
+    for r in range(sqrt_mod):
+        if z not in a_r:
+            a_r[z] = r
+        z *= base
+        z %= mod
+
+    # A == (1 / base^{sqrt(mod)})
+    A = mod_inv(pow(base, sqrt_mod, mod), mod)
+    z = x
+    for p in range(sqrt_mod):
+        if z in a_r:
+            r = a_r[z]
+            if not r == p == 0:
+                break
+        z *= A
+        z %= mod
+    else:
+        return None
+    return p * sqrt_mod + r

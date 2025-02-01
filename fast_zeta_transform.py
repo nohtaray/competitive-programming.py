@@ -60,7 +60,10 @@ def min_coloring_count(graph):
     def test(k):
         """
         k 個の独立集合の和集合のサイズを N にできるか == S の独立集合たちを k 色で彩色可能か
-        O(2^N * N)
+        O(2^N)
+        重複ありで選ぶので、この関数を使っても重複無しで彩色する方法の数は求められない
+        彩色の方法の数え上げには別の高速なアルゴリズムがあるらしい
+        https://atcoder.jp/contests/abc294/editorial/5999
         :param int k:
         """
         # https://www.slideshare.net/wata_orz/ss-12208032
@@ -74,8 +77,9 @@ def min_coloring_count(graph):
             f_t = pow(counts[t], k)  # f(T)
             sign = (-1) ** (N - B[t])  # |S| == N
             operands[t] = sign * f_t
-        patterns = fast_zeta_transform(operands, size=N)
-        return patterns[-1] > 0
+        # patterns = fast_zeta_transform(operands, size=N)
+        # return patterns[-1] > 0
+        return sum(operands) > 0
 
     ok = N
     ng = 0

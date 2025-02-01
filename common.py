@@ -12,6 +12,7 @@ import sys
 from collections import Counter, defaultdict, deque
 from copy import deepcopy
 from decimal import Decimal
+from fractions import Fraction
 from functools import cache, reduce, cmp_to_key
 from itertools import accumulate
 from math import gcd

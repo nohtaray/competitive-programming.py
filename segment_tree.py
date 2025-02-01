@@ -279,6 +279,43 @@ class LazySegmentTreeAddSum:
         return reduce(self._fn, ret_l + ret_r[::-1])
 
 
+## ac-library
+## 区間 max、区間 chmax
+## https://atcoder.jp/contests/abc382/submissions/61522085
+# op = max
+# e = -1
+# mapping = lambda f, s: max(f, s)
+# composition = lambda f, g: max(f, g)
+# id = -1
+# values = [...]
+# st = atcoder.lazysegtree.LazySegTree(op, e, mapping, composition, id, values)
+
+## 区間 max、区間 update
+## https://atcoder.jp/contests/abc382/submissions/61522219
+# op = max
+# e = -1
+# mapping = lambda f, s: f if f >= 0 else s
+# composition = lambda f, g: max(f, g)
+# id = -1
+# values = [...]
+# st = atcoder.lazysegtree.LazySegTree(op, e, mapping, composition, id, values)
+
+
+## 区間 min、区間 add
+# op = min
+# e = IINF
+# mapping = add
+# composition = add
+# id = 0
+# values = [...]
+# st = atcoder.lazysegtree.LazySegTree(op, e, mapping, composition, id, values)
+
+
+# ac-library
+# atcoder.lazysegtree.LazySegTree(...)
+# https://betrue12.hateblo.jp/entry/2020/09/23/005940
+
+
 if __name__ == "__main__":
     st = SegmentTree([0] * 4, op=operator.add)
     st.add(1, 1)
