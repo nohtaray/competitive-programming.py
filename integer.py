@@ -1,7 +1,24 @@
 import math
 from functools import reduce
-
 from operator import mul
+
+from atcoder._math import _is_prime, _primitive_root
+
+
+def is_prime(n):
+    """
+    素数判定
+    from atcoder._math import _is_prime, _primitive_root
+    """
+    return _is_prime(n)
+
+
+def primitive_root(p):
+    """
+    p の原始根
+    from atcoder._math import _is_prime, _primitive_root
+    """
+    return _primitive_root(p)
 
 
 def get_divisors(n):
