@@ -71,10 +71,16 @@ def compress(li, origin=0):
     座圧
     :param li:
     :param int origin:
-    :rtype: list of int
     """
     *ret, = map({v: i + origin for i, v in enumerate(sorted(set(li)))}.__getitem__, li)
-    return ret
+    v2i = {v: i for v, i in zip(li, ret)}
+    if origin <= 1:
+        i2v = [None] * (len(v2i) + origin)
+        for v, i in v2i.items():
+            i2v[i] = v
+    else:
+        i2v = {i: v for v, i in v2i.items()}
+    return ret, v2i, i2v
 
 
 def count_inversions(li, compress_values=False):
@@ -84,7 +90,7 @@ def count_inversions(li, compress_values=False):
     :rtype: int
     """
     if compress_values:
-        li = compress(li)
+        *li, _ = map({v: i for i, v in enumerate(sorted(set(li)))}.__getitem__, li)
     bit = BinaryIndexedTree(size=max(li) + 1)
     ret = 0
     for i in range(len(li)):
@@ -99,9 +105,7 @@ class OrderedSet:
         :param numbers:
         """
         numbers = list(sorted(set(numbers)))
-        indices = dict()
-        for n, cn in zip(numbers, compress(numbers)):
-            indices[n] = cn
+        _, indices, _ = compress(numbers)
 
         self._numbers = numbers
         self._indices = indices

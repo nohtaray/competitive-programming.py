@@ -77,9 +77,9 @@ def dijkstra(graph, start):
     return dist
 
 
-def eulerian_trail(tree, max_v, root=0):
+def euler_tour(tree, max_v, root=0):
     """
-    木のオイラー路; オイラーツアー
+    木のオイラーツアー (通った頂点を順に返す)
     :param list of (list of (int, int)) tree:
     :param int max_v:
     :param int root:
@@ -107,6 +107,41 @@ def eulerian_trail(tree, max_v, root=0):
         for u, w in tree[v]:
             if not seen[u]:
                 stack.append((v, d, -w, False))
+                stack.append((u, d + 1, w, True))
+    return trails, depths, weights
+
+
+def euler_tour_inout(tree, max_v, root=0):
+    """
+    木のオイラーツアー (頂点の出入りを順に返す)
+    各頂点について、入るときと出るときの 2 回記録される
+    :param list of (list of (int, int)) tree:
+    :param int max_v:
+    :param int root:
+    :return: (trails, depths, weights)
+    :rtype: (list of int, list of int, list of int)
+    """
+    seen = [False] * (max_v + 1)
+    # 頂点の履歴 (入ったときと出たときに記録)
+    trails = []
+    # 深さの履歴
+    depths = []
+    # 距離の履歴
+    weights = []
+    # Overflow 回避のためループで
+    stack = [(root, 0, 0, True)]
+    while stack:
+        v, d, w, forward = stack.pop()
+        seen[v] = True
+        trails.append(v)
+        depths.append(d)
+        weights.append(w)
+        if not forward:
+            continue
+
+        stack.append((v, d, -w, False))
+        for u, w in tree[v]:
+            if not seen[u]:
                 stack.append((u, d + 1, w, True))
     return trails, depths, weights
 
