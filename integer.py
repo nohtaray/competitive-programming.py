@@ -188,13 +188,9 @@ def extgcd(a, b):
     return d, y, x - q * y
 
 
-def find_integer_solutions(a, b, c, k=0):
+def find_integer_solutions(a, b, c, positive_only=False, k=None):
     """
     不定方程式 ax + by = c の整数解を求める
-    :param int a:
-    :param int b:
-    :param int c:
-    :param int k:
     :rtype: None|(int,int)
     """
     # 最大公約数を求める
@@ -210,7 +206,17 @@ def find_integer_solutions(a, b, c, k=0):
     x0 *= c
     y0 *= c
 
-    # k はなんでもいい
+    if k is None:
+        # y が最も小さい 0 以上の整数になる k を適当に設定
+        k = y0 // a
+        # # x が最も小さい 0 以上の整数になる k を適当に設定
+        # k = (-x0 + b - 1) // b
+    if positive_only:
+        # (x := x0 + k * b) < 0
+        # (y := y0 - k * a) < 0
+        # not (-x0 / b <= k <= y0 / a)
+        if -x0 > k * b or k * a > y0:
+            return None
     x = x0 + k * b
     y = y0 - k * a
     return x, y

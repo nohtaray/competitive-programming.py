@@ -17,6 +17,7 @@ from functools import cache, reduce, cmp_to_key
 from itertools import accumulate
 from math import gcd
 from operator import add, itemgetter, mul, xor
+from typing import List, Tuple, Dict
 
 import atcoder.convolution
 import atcoder.dsu
