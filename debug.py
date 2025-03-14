@@ -195,13 +195,15 @@ def generate_tree(V, directed=False, origin=1):
         return generate_undirected_graph(V=V, E=V - 1, origin=origin)
 
 
-def plot_graph(edges, directed=False):
+def plot_graph(edges, directed=False, v_offset=0):
     """
     :param typing.List[typing.Tuple[int]] edges: (from, to, [weight])
     :param bool directed:
+    :param int v_offset: 頂点番号のオフセット; 1-indexed を 0-indexed に変換するときに -1 する
     """
     if not edges:
         return
+    edges = [(v + v_offset, u + v_offset, *_) for v, u, *_ in edges]
     weighted = len(edges[0]) == 3
 
     cls = nx.DiGraph if directed else nx.Graph
