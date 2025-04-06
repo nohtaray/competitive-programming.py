@@ -11,7 +11,7 @@ class RollingHash:
         :param int base:
         :param int mod:
         """
-        if isinstance(seq, str):
+        if isinstance(seq, str) or seq and isinstance(seq[0], str):
             self._seq = seq = list(map(ord, seq))
         else:
             self._seq = seq
