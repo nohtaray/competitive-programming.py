@@ -2,6 +2,17 @@ import operator
 from functools import reduce
 
 
+def dump_matrix_bit(mat, width):
+    """
+    F2 体の行列を表示する
+    :param list of int mat:
+    :param int W:
+    """
+    import numpy as np
+    for row in mat:
+        print(np.binary_repr(row, width=width))
+
+
 def matrix_mul_mod(m1, m2, mod):
     """
     :param list of list m1:
@@ -75,44 +86,45 @@ def matrix_power(matrix, n, id_mat=None):
     return ret
 
 
-def gauss_jordan_bit(mat, W):
+def gauss_jordan_bit(rows, n_cols, n_rhs=0):
     """
-    掃き出し法で標準形 (を左右反転したもの) にする
+    掃き出し法で標準形にする
     O(HW^2)
-    :param list of int mat: mat[i] は i 行目のビット列
-    :param int W: ビット列の長さ; 連立方程式を解くときは解の存在判定ができるように -1 した値を渡すこと
+    :param list of int rows: rows[i] は i 行目のビット列
+    :param int n_cols: 拡大行列全体の列数 (ビット列の長さ)
+    :param int n_rhs: 拡大部分の列数 (連立方程式なら 1, 逆行列計算なら n_cols/2)
     """
-    mat = mat[:]
-    H = len(mat)
+    rows = rows[:]
+    n_rows = len(rows)
     rank = 0
-    for w in range(W):
-        if rank >= H:
+    for w in reversed(range(n_rhs, n_cols)):
+        if rank >= n_rows:
             break
-        col = [row >> w & 1 for row in mat]
+        col = [a >> w & 1 for a in rows]
         if not any(col[rank:]):
             continue
         h = col.index(1, rank)
-        pivot = mat[h]
-        for i in range(H):
+        pivot = rows[h]
+        for i in range(n_rows):
             if col[i]:
-                mat[i] ^= pivot
-        mat[h] = mat[rank]
-        mat[rank] = pivot
+                rows[i] ^= pivot
+        rows[h] = rows[rank]
+        rows[rank] = pivot
         rank += 1
-    return mat, rank
+    return rows, rank
 
 
-def count_solutions_bit(A, rhs, W, mod):
+def count_solutions_bit(rows, rhs, W, mod):
     """
     解の個数を求める
     O(HW^2)
-    :param list of int A: A[i] は i 行目のビット列
+    :param list of int rows: rows[i] は i 行目のビット列
     :param list of int rhs: rhs[i] は i 行目の右辺 (1 or 0)
-    :param int W: A のビット列の長さ (rhs は含まない)
+    :param int W: rows のビット列の長さ (rhs は含まない)
     """
-    H = len(A)
-    mat = [row | (b << W) for row, b in zip(A, rhs)]
-    mat, rank = gauss_jordan_bit(mat, W)
+    H = len(rows)
+    mat = [(a << 1) | b for a, b in zip(rows, rhs)]
+    mat, rank = gauss_jordan_bit(mat, W + 1, 1)
     if rank < H and any(mat[rank:]):
         # 解無し
         return 0
@@ -121,17 +133,43 @@ def count_solutions_bit(A, rhs, W, mod):
     return pow(2, free, mod)
 
 
-def gauss_jordan_bool(mat, W):
+def invert_matrix_bit(rows: list[int]) -> list[int] | None:
+    """
+    F2 体でビット列表現された行列 rows の逆行列を求める。
+    rows を拡大係数行列 [rows | I] にし、掃き出し法を用いて rows^-1 を得る。
+
+    :param rows: rows[i] は i 行目のビット列（長さ W の行列）
+    :param W: 行列の列数（= 行数を仮定する。正方行列でなければならない）
+    :return: 逆行列（各行がビット列）または None（逆行列が存在しない場合）
+    """
+    H = W = len(rows)
+
+    # 単位行列 I を右に拡張して [rows | I] を構築
+    mat = [row << W | (1 << (W - i - 1)) for i, row in enumerate(rows)]
+
+    # 拡張部分は W 列
+    mat, rank = gauss_jordan_bit(mat, W * 2, W)
+
+    if rank < W:
+        return None  # 非正則、逆行列は存在しない
+
+    # 各行の下位 W ビットが逆行列
+    inverse = [row & ((1 << W) - 1) for row in mat]
+    return inverse
+
+
+def gauss_jordan_bool(mat, n_cols, n_rhs=0):
     """
     掃き出し法で標準形にする
     O(HW^2)
     :param list of (list of bool) mat:
-    :param int W: 処理する列数; 連立方程式を解くときは解の存在判定ができるように mat の列数から -1 した値を渡すこと
+    :param int n_cols: 拡大行列全体の列数 (ビット列の長さ)
+    :param int n_rhs: 拡大部分の列数 (連立方程式なら 1, 逆行列計算なら n_cols/2)
     """
     mat = [row[:] for row in mat]
     H = len(mat)
     rank = 0
-    for w in range(W):
+    for w in range(n_cols - n_rhs):
         if rank >= H:
             break
         col = [row[w] for row in mat]
@@ -158,7 +196,7 @@ def count_solutions_bool(A, rhs, mod):
     H = len(A)
     W = len(A[0])
     mat = [[*a, b] for a, b in zip(A, rhs)]
-    mat, rank = gauss_jordan_bool(mat, W)
+    mat, rank = gauss_jordan_bool(mat, W + 1, 1)
     if rank < H and any([row[-1] for row in mat[rank:]]):
         # 解無し
         return 0
