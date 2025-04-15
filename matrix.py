@@ -133,6 +133,37 @@ def count_solutions_bit(rows, rhs, W, mod):
     return pow(2, free, mod)
 
 
+def count_solutions_bit2(cols, rhs_bit, H, mod):
+    """
+    解の個数を求める
+    https://trap.jp/post/435/
+    O(WH^2)
+    :param list of int cols: cols[i] は i 列目のビット列
+    :param int rhs_bit: 右辺のベクトルをビット列にしたもの (ビット列の向きを cols と合わせること)
+    :param int H: ビット列の長さ
+    """
+    # 横に倒して処理する
+    W = H
+    H = len(cols)
+    A = cols
+    mat, rank = gauss_jordan_bit(A, W)
+    X = rhs_bit
+    h = 0
+    i = W
+    while h < H and i >= 0 and X:
+        while i and X and ~X >> i & 1:
+            i -= 1
+        if i < 0:
+            break
+        if mat[h] >> i & 1:
+            X ^= mat[h]
+            i -= 1
+        h += 1
+    # rhs_bit を作れないなら解の個数は 0、作れるなら 0 の行の数だけ自由度がある
+    free = H - rank
+    return pow(2, free, mod) if X == 0 else 0
+
+
 def invert_matrix_bit(rows: list[int]) -> list[int] | None:
     """
     F2 体でビット列表現された行列 rows の逆行列を求める。
