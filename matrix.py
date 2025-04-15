@@ -6,7 +6,7 @@ def dump_matrix_bit(mat, width):
     """
     F2 体の行列を表示する
     :param list of int mat:
-    :param int W:
+    :param int width:
     """
     import numpy as np
     for row in mat:
@@ -83,6 +83,19 @@ def matrix_power(matrix, n, id_mat=None):
             ret = matrix_mul(ret, matrix)
         matrix = matrix_mul(matrix, matrix)
         n >>= 1
+    return ret
+
+
+def matrix_mul_bit(rows, rhs):
+    """
+    行列とベクトルの積 (mod2)
+    :param list of int rows: rows[i] は i 行目のビット列
+    :param int rhs: 右辺のベクトルをビット列にしたもの (上位ビットが上)
+    """
+    ret = 0
+    for row in rows:
+        ret <<= 1
+        ret |= (row & rhs).bit_count() & 1
     return ret
 
 
@@ -170,7 +183,6 @@ def invert_matrix_bit(rows: list[int]) -> list[int] | None:
     rows を拡大係数行列 [rows | I] にし、掃き出し法を用いて rows^-1 を得る。
 
     :param rows: rows[i] は i 行目のビット列（長さ W の行列）
-    :param W: 行列の列数（= 行数を仮定する。正方行列でなければならない）
     :return: 逆行列（各行がビット列）または None（逆行列が存在しない場合）
     """
     H = W = len(rows)
