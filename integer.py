@@ -1,6 +1,4 @@
 import math
-from functools import reduce
-from operator import mul
 
 from atcoder._math import _is_prime, _primitive_root
 
@@ -19,6 +17,30 @@ def primitive_root(p):
     from atcoder._math import _is_prime, _primitive_root
     """
     return _primitive_root(p)
+
+
+def get_orders(A, prime):
+    """
+    A の各要素の位数を求める
+    :param list of int A:
+    :param int prime:
+    :rtype: list of int
+    """
+    N = len(A)
+    factors = list(set(get_factors(prime - 1)))
+    ret = [0] * N
+    for i in range(N):
+        # https://atcoder.jp/contests/abc335/editorial/9042
+        x = prime - 1
+        for f in factors:
+            while x % f == 0:
+                x //= f
+            t = pow(A[i], x, prime)
+            while t != 1:
+                t = pow(t, f, prime)
+                x *= f
+        ret[i] = x
+    return ret
 
 
 def get_divisors(n):
@@ -90,44 +112,6 @@ def mod_inv(a, mod):
         u, v = v, u
     u %= mod
     return u
-
-
-def ncr(n, r, mod=None):
-    """
-    組み合わせの数 nCr
-    :param int n:
-    :param int r:
-    :param int mod: 3 以上の素数であること
-    :rtype: int
-    """
-    if n < r:
-        return 0
-
-    # n が 10**6 * 2 のときに TLE した
-    # https://atcoder.jp/contests/agc051/submissions/60117826
-    # 覚えたら関数ごと消す
-    raise "遅いので combination.py を使ってください"
-
-    # 何度も呼ぶ場合は combination.py をつかう
-    r = min(n - r, r)
-    if r == 0:
-        return 1
-    if mod:
-        return reduce(mul, range(n, n - r, -1)) * mod_inv(reduce(mul, range(r, 0, -1)), mod) % mod
-    else:
-        # math.factorial よりこっちのが速い
-        # https://atcoder.jp/contests/abc110/submissions?f.Task=&f.Language=&f.Status=&f.User=nohtaray
-        return reduce(mul, range(n, n - r, -1)) // reduce(mul, range(r, 0, -1))
-
-
-def nhr(n, r, mod=None):
-    """
-    重複組み合わせの総数 nHr
-    :param int n:
-    :param int r:
-    :param int mod:
-    """
-    return ncr(n + r - 1, r, mod)
 
 
 def get_primes(max=None, count=None):
