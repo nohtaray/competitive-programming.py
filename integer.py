@@ -97,21 +97,11 @@ def mod_inv(a, mod):
     """
     a の逆元
     mod は a と互いに素であること
-    :param a:
-    :param mod:
-    :return:
     """
-    b = mod
-    u = 1
-    v = 0
-    while b:
-        t = a // b
-        a -= t * b
-        a, b = b, a
-        u -= t * v
-        u, v = v, u
-    u %= mod
-    return u
+    d, x, _ = extgcd(a, mod)
+    if d != 1:
+        return None
+    return x % mod
 
 
 def get_primes(max=None, count=None):
@@ -172,40 +162,6 @@ def extgcd(a, b):
     return d, y, x - q * y
 
 
-def find_integer_solutions(a, b, c, positive_only=False, k=None):
-    """
-    不定方程式 ax + by = c の整数解を求める
-    :rtype: None|(int,int)
-    """
-    # 最大公約数を求める
-    g = math.gcd(a, b)
-
-    # c が gcd(a, b) で割り切れない場合、解は存在しない
-    if c % g != 0:
-        return None
-
-    # a と b を gcd で割り、簡約化
-    a, b, c = a // g, b // g, c // g
-    _, x0, y0 = extgcd(a, b)
-    x0 *= c
-    y0 *= c
-
-    if k is None:
-        # y が最も小さい 0 以上の整数になる k を適当に設定
-        k = y0 // a
-        # # x が最も小さい 0 以上の整数になる k を適当に設定
-        # k = (-x0 + b - 1) // b
-    if positive_only:
-        # (x := x0 + k * b) < 0
-        # (y := y0 - k * a) < 0
-        # not (-x0 / b <= k <= y0 / a)
-        if -x0 > k * b or k * a > y0:
-            return None
-    x = x0 + k * b
-    y = y0 - k * a
-    return x, y
-
-
 def mod_log(x, base, mod, allow_zero=True):
     """
     log_{base}(x) % mod
@@ -247,3 +203,139 @@ def mod_log(x, base, mod, allow_zero=True):
     else:
         return None
     return p * sqrt_mod + r
+
+
+def find_integer_solutions(a, b, c, positive_only=False, k=None):
+    """
+    不定方程式 ax + by = c の整数解を求める
+    :rtype: None|(int,int)
+    """
+    # 最大公約数を求める
+    g = math.gcd(a, b)
+
+    # c が gcd(a, b) で割り切れない場合、解は存在しない
+    if c % g != 0:
+        return None
+
+    # a と b を gcd で割り、簡約化
+    a, b, c = a // g, b // g, c // g
+    _, x0, y0 = extgcd(a, b)
+    x0 *= c
+    y0 *= c
+
+    if k is None:
+        # y が最も小さい 0 以上の整数になる k を適当に設定
+        k = y0 // a
+        # # x が最も小さい 0 以上の整数になる k を適当に設定
+        # k = (-x0 + b - 1) // b
+    if positive_only:
+        # (x := x0 + k * b) < 0
+        # (y := y0 - k * a) < 0
+        # not (-x0 / b <= k <= y0 / a)
+        if -x0 > k * b or k * a > y0:
+            return None
+    x = x0 + k * b
+    y = y0 - k * a
+    return x, y
+
+
+def solve_modular_equation(a, b, c, mod):
+    """
+    合同式
+      a*x + b*y ≡ c (mod M)
+    を解く関数．
+
+    この合同式は、整数 k を適切に選んで
+      a*x + b*y = c + M*k
+    となる (x,y) を求めることに同値．
+
+    存在条件は、実は a*x+b*y が常に gcd(a,b,M) の倍数であることから、
+      gcd(a,b,M) | c
+    である必要がある．
+
+    解が存在しない場合は None を返す．
+    存在する場合は1つの解 (x, y) を返す（一般解のひとつ）。
+    """
+    if a == b == c == 0:
+        return 0, 0
+    # 存在条件のチェック
+    d0 = math.gcd(a, math.gcd(b, mod))
+    if c % d0 != 0:
+        return None
+
+    # a*x+b*y = c + M*k の解を求めるため，まず k を選ぶ。
+    # 解が得られるためには、右辺 c+M*k が
+    # g = gcd(a,b) で割り切れる必要がある．
+    # すなわち、k が以下の合同式を満たす必要がある：
+    #    M*k ≡ -c  (mod g)
+    #
+    # ここで、M と g の gcd を d として、
+    # M = d * M_dash,  g = d * g_dash,  c = d * c_dash と書くと、
+    #    M_dash * k ≡ -c_dash  (mod g_dash)
+    # となり、gcd(M_dash, g_dash)=1 なので逆元が存在する。
+    #
+    # これにより k の特解が得られる。
+    g = math.gcd(a, b)
+    d = math.gcd(mod, g)
+    # 解の存在には d | c も必要（もともとの d0 | c より自動に満たされるはず）
+    if c % d != 0:
+        return None
+    M_dash = mod // d
+    g_dash = g // d
+    c_dash = c // d
+
+    inv = mod_inv(M_dash, g_dash)
+    if inv is None:
+        return None  # 通常はここには来ない
+    k0 = ((-c_dash) * inv) % g_dash
+
+    # これにより、c_new = c + M*k0 は g で割り切れる
+    c_new = c + mod * k0
+
+    # 従って、a*x+b*y = c_new の解が存在するので、
+    sol = find_integer_solutions(a, b, c_new, k=0)
+    if sol is None:
+        return None
+    x, y = sol
+    # 得られた解は a*x+b*y = c + M*k0 となるので、
+    # 自動的に a*x+b*y ≡ c (mod M) を満たす。
+    return x, y
+
+
+if __name__ == "__main__":
+    def test_modular_equation(M, num_tests=100000):
+        """
+        a, b, c が M 未満（M<=10**9）となるランダムケースについて，
+        solve_modular_equation で得た解が合同式
+           a*x+b*y ≡ c (mod M)
+        を満たすかテストする。
+        存在条件は gcd(a,b,M) | c となるので、それに合致しない場合は解が得られないことも確認する。
+        """
+        import random
+        for i in range(num_tests):
+            a = random.randint(0, M - 1)
+            b = random.randint(0, M - 1)
+            c = random.randint(0, M - 1)
+            sol = solve_modular_equation(a, b, c, M)
+            d0 = math.gcd(a, math.gcd(b, M))
+            if c % d0 != 0:
+                # 存在条件を満たしていないので解は存在しないはず
+                if sol is not None:
+                    print(f"Test {i}: expected no solution for a={a}, b={b}, c={c}, M={M}")
+                    return
+            else:
+                # 解が存在するはず
+                if sol is None:
+                    print(f"Test {i}: expected a solution for a={a}, b={b}, c={c}, M={M}")
+                    return
+                x, y = sol
+                lhs = (a * x + b * y) % M
+                rhs = c % M
+                if lhs != rhs:
+                    print(f"Test {i}: solution (x={x}, y={y}) does not satisfy equation for a={a}, b={b}, c={c}, M={M}")
+                    print(f"Computed: (a*x+b*y) mod M = {lhs}, expected {rhs}")
+                    return
+        print("All tests passed.")
+
+
+    test_modular_equation(998244353, 100000)
