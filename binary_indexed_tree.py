@@ -66,6 +66,57 @@ class BinaryIndexedTree:
         return self._size
 
 
+class BinaryIndexedTree2D:
+    # http://hos.ac/slides/20140319_bit.pdf
+    def __init__(self, H, W):
+        """
+        :param int H:
+        :param int W:
+        """
+        self._bit = [[0] * (W + 1) for _ in range(H + 1)]
+        self._H = H
+        self._W = W
+
+    def add(self, h, w, a):
+        """
+        (h, w) に a を加える
+        :param int h:
+        :param int w:
+        :param int a:
+        """
+        i = h + 1
+        while i <= self._H:
+            j = w + 1
+            while j <= self._W:
+                self._bit[i][j] += a
+                j += j & -j
+            i += i & -i
+
+    def get(self, h, w):
+        return self.sum(h + 1, w + 1) - self.sum(h + 1, w) - self.sum(h, w + 1) + self.sum(h, w)
+
+    def set(self, h, w, a):
+        self.add(h, w, a - self.get(h, w))
+
+    def sum(self, h, w):
+        """
+        \sum_{i=0}^{h-1} \sum_{j=0}^{w-1} a_{i,j}
+        :param int h:
+        :param int w:
+        """
+        if h <= 0 or w <= 0:
+            return 0
+        ret = 0
+        i = h
+        while i > 0:
+            j = w
+            while j > 0:
+                ret += self._bit[i][j]
+                j -= j & -j
+            i -= i & -i
+        return ret
+
+
 def compress(li, origin=0):
     """
     座圧
@@ -100,37 +151,6 @@ def count_inversions(li, compress_values=False):
 
 
 class OrderedSet:
-    def __init__(self, numbers):
-        """
-        :param numbers:
-        """
-        numbers = list(sorted(set(numbers)))
-        _, indices, _ = compress(numbers)
-
-        self._numbers = numbers
-        self._indices = indices
-        self._bit = BinaryIndexedTree(len(numbers))
-        self._set = set()
-
-    def __contains__(self, item):
-        return item in self._set
-
-    def add(self, item):
-        if item not in self._set:
-            i = self._indices[item]
-            self._bit.add(i, 1)
-            self._set.add(item)
-
-    def remove(self, item):
-        if item in self._set:
-            i = self._indices[item]
-            self._bit.add(i, -1)
-            self._set.remove(item)
-
-    def lower_bound(self, item):
-        # TODO: 実装
-        pass
-
-    def upper_bound(self, item):
-        # TODO: 実装
-        pass
+    # sortedcontainers か、これ↓を使う
+    # https://github.com/tatyam-prime/SortedSet
+    pass
