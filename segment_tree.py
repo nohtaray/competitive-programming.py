@@ -1,4 +1,5 @@
 import operator
+from collections import defaultdict
 from functools import reduce
 
 
@@ -70,6 +71,64 @@ class SegmentTree:
 
     def __len__(self):
         return self._size
+
+
+class DynamicSegmentTree:
+    def __init__(self, size, e, op=operator.add):
+        """
+        セグ木の配列を defaultdict に変えただけ
+        おっそいので使用非推奨
+        後日ちゃんと実装するか C++ に変換して使う
+        https://atcoder.jp/contests/abc403/submissions/65324407
+        """
+        self._size = size
+        self._op = op
+        self._tree = defaultdict(lambda: e)
+
+    def set(self, i, value):
+        """
+        values[i] = value
+        :param int i:
+        :param value:
+        """
+        i += self._size
+        self._tree[i] = value
+        i >>= 1
+        while i > 0:
+            self._tree[i] = self._op(self._tree[i << 1], self._tree[i << 1 | 1])
+            i >>= 1
+
+    def add(self, i, value):
+        """
+        values[i] = values[i]・value
+        :param int i:
+        :param value:
+        """
+        new_value = self._op(self._tree[self._size + i], value)
+        self.set(i, new_value)
+
+    def get(self, l, r=None):
+        """
+        [l, r) に op を順番に適用した値
+        :param int l:
+        :param int|None r:
+        """
+        if r is None:
+            return self._tree[self._size + l]
+        ret_l = []
+        ret_r = []
+        l += self._size
+        r += self._size
+        while l < r:
+            if l & 1:
+                ret_l.append(self._tree[l])
+                l += 1
+            if r & 1:
+                r -= 1
+                ret_r.append(self._tree[r])
+            l >>= 1
+            r >>= 1
+        return reduce(self._op, ret_l + ret_r)
 
 
 class LazySegmentTreeAddMin:
