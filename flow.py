@@ -358,6 +358,8 @@ class DictMinCostFlow:
 class PrimalDual:
     """
     最小費用流 ダイクストラ版
+    TODO: 負の辺があってもポテンシャルをいい感じにすると適用できるっぽい
+    https://niuez.hatenablog.com/entry/2019/03/04/142903#:~:text=%E8%B7%9D%E9%9B%A2%0A%20%20%20%20return%20result-,%E6%9C%80%E5%B0%8F%E8%B2%BB%E7%94%A8%E6%B5%81,-%E6%9C%80%E5%B0%8F%E8%B2%BB%E7%94%A8%E6%B5%81
     """
 
     def __init__(self, graph=None, residual=None):
