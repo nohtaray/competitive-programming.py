@@ -303,6 +303,7 @@ def solve_modular_equation(a, b, c, mod):
 
 
 if __name__ == "__main__":
+
     def test_modular_equation(M, num_tests=100000):
         """
         a, b, c が M 未満（M<=10**9）となるランダムケースについて，
@@ -312,6 +313,7 @@ if __name__ == "__main__":
         存在条件は gcd(a,b,M) | c となるので、それに合致しない場合は解が得られないことも確認する。
         """
         import random
+
         for i in range(num_tests):
             a = random.randint(0, M - 1)
             b = random.randint(0, M - 1)
@@ -321,21 +323,26 @@ if __name__ == "__main__":
             if c % d0 != 0:
                 # 存在条件を満たしていないので解は存在しないはず
                 if sol is not None:
-                    print(f"Test {i}: expected no solution for a={a}, b={b}, c={c}, M={M}")
+                    print(
+                        f"Test {i}: expected no solution for a={a}, b={b}, c={c}, M={M}"
+                    )
                     return
             else:
                 # 解が存在するはず
                 if sol is None:
-                    print(f"Test {i}: expected a solution for a={a}, b={b}, c={c}, M={M}")
+                    print(
+                        f"Test {i}: expected a solution for a={a}, b={b}, c={c}, M={M}"
+                    )
                     return
                 x, y = sol
                 lhs = (a * x + b * y) % M
                 rhs = c % M
                 if lhs != rhs:
-                    print(f"Test {i}: solution (x={x}, y={y}) does not satisfy equation for a={a}, b={b}, c={c}, M={M}")
+                    print(
+                        f"Test {i}: solution (x={x}, y={y}) does not satisfy equation for a={a}, b={b}, c={c}, M={M}"
+                    )
                     print(f"Computed: (a*x+b*y) mod M = {lhs}, expected {rhs}")
                     return
         print("All tests passed.")
-
 
     test_modular_equation(998244353, 100000)

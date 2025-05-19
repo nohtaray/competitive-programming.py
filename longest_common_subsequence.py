@@ -16,7 +16,7 @@ class LongestCommonSubsequence:
         :rtype: str
         """
         # dp[i + 1][j + 1]: s[:i] と t[:i] の最長共通部分列
-        dp = [[''] * (len(self._t) + 1) for _ in range(len(self._s) + 1)]
+        dp = [[""] * (len(self._t) + 1) for _ in range(len(self._s) + 1)]
         for i, j in itertools.product(range(len(self._s)), range(len(self._t))):
             if self._s[i] == self._t[j]:
                 dp[i + 1][j + 1] = dp[i][j] + self._s[i]

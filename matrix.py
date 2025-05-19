@@ -9,6 +9,7 @@ def dump_matrix_bit(mat, width):
     :param int width:
     """
     import numpy as np
+
     for row in mat:
         print(np.binary_repr(row, width=width))
 
@@ -59,7 +60,9 @@ def matrix_mul(m1, m2):
     for r1 in range(len(m1)):
         row = []
         for c2 in range(len(m2[0])):
-            row.append(reduce(operator.add, [m1[r1][r2] * m2[r2][c2] for r2 in range(len(m2))]))
+            row.append(
+                reduce(operator.add, [m1[r1][r2] * m2[r2][c2] for r2 in range(len(m2))])
+            )
         rows.append(row)
     return rows
 

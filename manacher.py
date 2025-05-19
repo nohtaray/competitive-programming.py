@@ -34,4 +34,4 @@ def longest_palindrome(S):
         if R[i] > max_len:
             max_len = R[i]
             max_pos = i
-    return S[max_pos - max_len + 1:max_pos + max_len].replace("$", "")
+    return S[max_pos - max_len + 1 : max_pos + max_len].replace("$", "")

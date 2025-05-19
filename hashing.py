@@ -3,7 +3,7 @@ import random
 
 class RollingHash:
     # Verify: http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_14_B
-    def __init__(self, seq, base=37, mod=2 ** 61 - 1):
+    def __init__(self, seq, base=37, mod=2**61 - 1):
         """
         64bit を超えるとハッシュの構築だけで死ぬほど重くなるので避ける
         https://atcoder.jp/contests/abc284/submissions/41589904
@@ -91,7 +91,7 @@ class RollingHash:
 
 
 class ZobristHash:
-    def __init__(self, items, mod=2 ** 61 - 1):
+    def __init__(self, items, mod=2**61 - 1):
         """
         :param typing.Iterable[typing.Hashable] items:
         :param int mod:
@@ -176,7 +176,7 @@ class ZobristHash:
 
 
 class SequenceZobristHash:
-    def __init__(self, seq, mod=2 ** 61 - 1):
+    def __init__(self, seq, mod=2**61 - 1):
         """
         連続する部分列を多重集合としてハッシュを取る
         https://atcoder.jp/contests/abc367/editorial/10692

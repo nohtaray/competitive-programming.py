@@ -2,7 +2,9 @@ import heapq
 from typing import List, Tuple
 
 
-def minimum_steiner_tree_dense(graph: List[List[int]], terminals: List[int]) -> (int, List[List[int]]):
+def minimum_steiner_tree_dense(
+    graph: List[List[int]], terminals: List[int]
+) -> (int, List[List[int]]):
     """
     無向グラフの最小シュタイナー木 (密グラフ用)
     K をターミナル数として O(3^K V + 2^K V^2)
@@ -49,7 +51,9 @@ def minimum_steiner_tree_dense(graph: List[List[int]], terminals: List[int]) -> 
     return min(dp[-1]), dp
 
 
-def minimum_steiner_tree_sparse(graph: List[List[Tuple[int, int]]], terminals: List[int]) -> (int, List[List[int]]):
+def minimum_steiner_tree_sparse(
+    graph: List[List[Tuple[int, int]]], terminals: List[int]
+) -> (int, List[List[int]]):
     """
     無向グラフの最小シュタイナー木 (疎グラフ用)
     K をターミナル数として O(3^K V + 2^K (V+E)logE)

@@ -59,7 +59,7 @@ def trisect_int(fn, lo, hi):
     if lo >= hi:
         return fn(lo), lo
 
-    INF = float('inf')
+    INF = float("inf")
     fib = [1, 1, 2]
     while fib[-1] < hi - lo + 2:
         fib.append(fib[-1] + fib[-2])

@@ -36,7 +36,7 @@ def ModInt(mod):
     return _ModInt
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     MI7 = ModInt(mod=7)
     assert int(MI7(1) + MI7(8)) == 2
     assert int(MI7(1) + 8) == 2

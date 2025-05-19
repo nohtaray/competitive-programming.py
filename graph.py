@@ -38,7 +38,7 @@ def bellman_ford(graph, from_v, to_v):
         if r1 & r2:
             vertices.append(v)
 
-    dist = [float('inf')] * len(graph)
+    dist = [float("inf")] * len(graph)
     dist[from_v] = 0
     updated = True
     for _ in range(len(graph) + 1):
@@ -50,7 +50,7 @@ def bellman_ford(graph, from_v, to_v):
                     updated = True
         if not updated:
             break
-    return -float('inf') if updated else dist[to_v]
+    return -float("inf") if updated else dist[to_v]
 
 
 def dijkstra(graph, start):
@@ -173,7 +173,7 @@ def topological_sort(graph):
                 zeros.append(u)
 
     if len(ret) != len(graph):
-        raise ValueError('閉路があります')
+        raise ValueError("閉路があります")
 
     return ret
 

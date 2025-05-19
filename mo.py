@@ -39,7 +39,7 @@ def hilbert_order(x, y, pow, rotate=0):
 
 
 if __name__ == "__main__":
-    N = 10 ** 5
+    N = 10**5
     QUERIES = []
     # mo's algorithm
     sqr = math.sqrt(N)

@@ -93,7 +93,12 @@ class BinaryIndexedTree2D:
             i += i & -i
 
     def get(self, h, w):
-        return self.sum(h + 1, w + 1) - self.sum(h + 1, w) - self.sum(h, w + 1) + self.sum(h, w)
+        return (
+            self.sum(h + 1, w + 1)
+            - self.sum(h + 1, w)
+            - self.sum(h, w + 1)
+            + self.sum(h, w)
+        )
 
     def set(self, h, w, a):
         self.add(h, w, a - self.get(h, w))
@@ -123,7 +128,9 @@ def compress(li, origin=0):
     :param li:
     :param int origin:
     """
-    *ret, = map({v: i + origin for i, v in enumerate(sorted(set(li)))}.__getitem__, li)
+    (*ret,) = map(
+        {v: i + origin for i, v in enumerate(sorted(set(li)))}.__getitem__, li
+    )
     v2i = {v: i for v, i in zip(li, ret)}
     if origin <= 1:
         i2v = [None] * (len(v2i) + origin)

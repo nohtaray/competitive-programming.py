@@ -195,7 +195,7 @@ class PointInt:
         原点からの距離の二乗
         :rtype: int
         """
-        return self.x ** 2 + self.y ** 2
+        return self.x**2 + self.y**2
 
     def phase(self):
         """
@@ -212,7 +212,9 @@ class PointInt:
         :param PointInt q:
         :rtype: float
         """
-        return ((q - self).phase() - (p - self).phase() + cmath.pi) % cmath.tau - cmath.pi
+        return (
+            (q - self).phase() - (p - self).phase() + cmath.pi
+        ) % cmath.tau - cmath.pi
 
     def area2(self, p, q):
         """
@@ -345,9 +347,11 @@ class PolygonInt:
         隣り合う3点を順に返すイテレータ
         :rtype: typing.Iterator[(PointInt, PointInt, PointInt)]
         """
-        return zip(self.points,
-                   self.points[1:] + self.points[:1],
-                   self.points[2:] + self.points[:2])
+        return zip(
+            self.points,
+            self.points[1:] + self.points[:1],
+            self.points[2:] + self.points[:2],
+        )
 
     def area2(self):
         """
@@ -383,7 +387,11 @@ class PolygonInt:
             if ccw == {PointInt.CCW_ONLINE_FRONT, PointInt.CCW_COUNTER_CLOCKWISE}:
                 return True
         if allow_collapsed and len(ccw) == 3:
-            return ccw == {PointInt.CCW_ONLINE_FRONT, PointInt.CCW_ONLINE_BACK, PointInt.CCW_ON_SEGMENT}
+            return ccw == {
+                PointInt.CCW_ONLINE_FRONT,
+                PointInt.CCW_ONLINE_BACK,
+                PointInt.CCW_ON_SEGMENT,
+            }
         return False
 
     def has_point_on_edge(self, p):
@@ -435,17 +443,22 @@ class PolygonInt:
         #: :type: list of (PointInt|None)
         ret = [None] * (len(points) * 2)
         for p in points:
-            while sz > 1 and (ret[sz - 1] - ret[sz - 2]).det(p - ret[sz - 1]) < det_lower:
+            while (
+                sz > 1 and (ret[sz - 1] - ret[sz - 2]).det(p - ret[sz - 1]) < det_lower
+            ):
                 sz -= 1
             ret[sz] = p
             sz += 1
         floor = sz
         for p in reversed(points[:-1]):
-            while sz > floor and (ret[sz - 1] - ret[sz - 2]).det(p - ret[sz - 1]) < det_lower:
+            while (
+                sz > floor
+                and (ret[sz - 1] - ret[sz - 2]).det(p - ret[sz - 1]) < det_lower
+            ):
                 sz -= 1
             ret[sz] = p
             sz += 1
-        ret = ret[:sz - 1]
+        ret = ret[: sz - 1]
 
         if allow_straight and len(ret) > len(points):
             # allow_straight かつ全部一直線のときに二重にカウントしちゃう

@@ -52,6 +52,5 @@ class SparseTable:
             return None
         p = self._msb[b - a]
         return self._fn(
-            self._values[self._table[a][p]],
-            self._values[self._table[b - (1 << p)][p]]
+            self._values[self._table[a][p]], self._values[self._table[b - (1 << p)][p]]
         )

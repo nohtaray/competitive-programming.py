@@ -37,8 +37,8 @@ from sortedcontainers import SortedList, SortedSet, SortedKeyList, SortedDict
 if os.getenv("LOCAL"):
     sys.stdin = open("_in.txt", "r")
 
-sys.setrecursionlimit(10 ** 9)
+sys.setrecursionlimit(10**9)
 INF = float("inf")
-IINF = 10 ** 18
-# MOD = 10 ** 9 + 7
+IINF = 10**18
+# MOD = 10**9 + 7
 MOD = 998244353

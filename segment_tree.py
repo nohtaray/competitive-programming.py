@@ -13,7 +13,7 @@ class SegmentTree:
         self._size = len(values)
         self._op = op
         tree = [None] * self._size * 2
-        tree[self._size:] = values[:]
+        tree[self._size :] = values[:]
         for i in reversed(range(1, self._size)):
             tree[i] = self._op(tree[i << 1], tree[i << 1 | 1])
         self._tree = tree
@@ -67,7 +67,7 @@ class SegmentTree:
         """
         O(N) で全部の値を取得
         """
-        return self._tree[self._size:]
+        return self._tree[self._size :]
 
     def __len__(self):
         return self._size
@@ -144,7 +144,7 @@ class LazySegmentTreeAddMin:
         self._fn = min
 
         tree = [self._id] * self._size * 2
-        tree[self._size:] = values[:]
+        tree[self._size :] = values[:]
         for i in reversed(range(1, self._size)):
             tree[i] = self._fn(tree[i << 1], tree[i << 1 | 1])
         self._tree = tree
@@ -164,10 +164,13 @@ class LazySegmentTreeAddMin:
         """
         while p > 1:
             p >>= 1
-            self._tree[p] = self._fn(
-                self._tree[p << 1],
-                self._tree[p << 1 | 1],
-            ) + self._delay[p]
+            self._tree[p] = (
+                self._fn(
+                    self._tree[p << 1],
+                    self._tree[p << 1 | 1],
+                )
+                + self._delay[p]
+            )
 
     def _eval(self, p):
         """
@@ -244,7 +247,7 @@ class LazySegmentTreeAddSum:
         self._fn = operator.add
 
         tree = [self._id] * self._size * 2
-        tree[self._size:] = values[:]
+        tree[self._size :] = values[:]
         for i in reversed(range(1, self._size)):
             tree[i] = self._fn(tree[i << 1], tree[i << 1 | 1])
         self._tree = tree
@@ -271,10 +274,13 @@ class LazySegmentTreeAddSum:
         """
         while p > 1:
             p >>= 1
-            self._tree[p] = self._fn(
-                self._tree[p << 1],
-                self._tree[p << 1 | 1],
-            ) + self._delay[p] * self._children[p]
+            self._tree[p] = (
+                self._fn(
+                    self._tree[p << 1],
+                    self._tree[p << 1 | 1],
+                )
+                + self._delay[p] * self._children[p]
+            )
 
     def _eval(self, p):
         """
@@ -394,9 +400,9 @@ if __name__ == "__main__":
     assert st.get(1, 4) == 6
     assert st.get(2, 4) == 5
 
-    st = SegmentTree([2 ** 31 - 1] * 3, op=min)
+    st = SegmentTree([2**31 - 1] * 3, op=min)
     st.set(1, 5)
-    assert st.get(0, 1) == 2 ** 31 - 1
+    assert st.get(0, 1) == 2**31 - 1
     assert st.get(0, 2) == 5
     assert st.get(1, 3) == 5
 
@@ -414,7 +420,7 @@ if __name__ == "__main__":
         if i % 3 == 0:
             assert st1.get(l, r) == test[l:r].min()
         st1.add(l, r, i * pow(-1, i))
-        test[l: r] += i * pow(-1, i)
+        test[l:r] += i * pow(-1, i)
         i += 1
 
     # Test LazySegmentTreeAddSum
@@ -426,5 +432,5 @@ if __name__ == "__main__":
         if i % 3 == 0:
             assert st1.get(l, r) == test[l:r].sum()
         st1.add(l, r, i * pow(-1, i))
-        test[l: r] += i * pow(-1, i)
+        test[l:r] += i * pow(-1, i)
         i += 1

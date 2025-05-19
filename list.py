@@ -5,7 +5,7 @@ import itertools
 from libs.integer import get_factors
 
 
-def cummax(it, first=-float('inf')):
+def cummax(it, first=-float("inf")):
     """
     累積 max
     :param collections.Iterable it:
@@ -19,7 +19,7 @@ def cummax(it, first=-float('inf')):
     return ret
 
 
-def cummin(it, first=float('inf')):
+def cummin(it, first=float("inf")):
     """
     累積 min
     :param collections.Iterable it:
@@ -58,7 +58,7 @@ def cumsum2(arr):
 def cummax2(arr):
     H = len(arr)
     W = len(arr[0])
-    ret = [[-float('inf')] * (W + 1) for _ in range(H + 1)]
+    ret = [[-float("inf")] * (W + 1) for _ in range(H + 1)]
     for h, w in itertools.product(range(H), range(W)):
         ret[h + 1][w + 1] = max(ret[h][w + 1], ret[h + 1][w], arr[h][w])
     return ret
@@ -86,9 +86,14 @@ def lcm(it, mod):
 
 
 def argsort(li, key=None, reverse=False):
-    return [i for _, i in sorted(
-        [(a, i) for i, a in enumerate(li)], key=(lambda t: key(t[0])) if key else None, reverse=reverse
-    )]
+    return [
+        i
+        for _, i in sorted(
+            [(a, i) for i, a in enumerate(li)],
+            key=(lambda t: key(t[0])) if key else None,
+            reverse=reverse,
+        )
+    ]
 
 
 if __name__ == "__main__":

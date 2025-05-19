@@ -49,7 +49,7 @@ class Dinic:
                     que.append((u, d + 1))
         return ret
 
-    def _dfs(self, s, t, dist, iter, flow=float('inf')):
+    def _dfs(self, s, t, dist, iter, flow=float("inf")):
         """
         :param int s:
         :param int t:
@@ -142,7 +142,7 @@ class DictDinic:
                     que.append((u, d + 1))
         return ret
 
-    def _dfs(self, s, t, dist, iter, flow=float('inf')):
+    def _dfs(self, s, t, dist, iter, flow=float("inf")):
         """
         :param s:
         :param t:
@@ -229,7 +229,7 @@ class MinCostFlow:
         total_cost = 0
         while remains > 0:
             # 最短路
-            dist = [float('inf')] * len(self.graph)
+            dist = [float("inf")] * len(self.graph)
             preve = [None] * len(self.graph)
             prevv = [None] * len(self.graph)
             dist[from_v] = 0
@@ -245,7 +245,7 @@ class MinCostFlow:
                             preve[u] = edge
                             stop = False
             flow = remains
-            if dist[to_v] == float('inf'):
+            if dist[to_v] == float("inf"):
                 total_cost = -1
                 break
 
@@ -315,7 +315,7 @@ class DictMinCostFlow:
         total_cost = 0
         while remains > 0:
             # 最短路
-            dist = defaultdict(lambda: float('inf'))
+            dist = defaultdict(lambda: float("inf"))
             preve = defaultdict(lambda: None)
             prevv = defaultdict(lambda: None)
             dist[from_v] = 0
@@ -331,7 +331,7 @@ class DictMinCostFlow:
                             preve[u] = edge
                             stop = False
             flow = remains
-            if dist[to_v] == float('inf'):
+            if dist[to_v] == float("inf"):
                 total_cost = -1
                 break
 
@@ -405,7 +405,7 @@ class PrimalDual:
         h = [0] * len(self.graph)
         remains = flow
         while remains > 0:
-            dist = [float('inf')] * len(self.graph)
+            dist = [float("inf")] * len(self.graph)
             dist[from_v] = 0
             heap = [(0, from_v)]
 
@@ -422,7 +422,7 @@ class PrimalDual:
                         preve[u] = edge
                         heapq.heappush(heap, (dist[u], u))
 
-            if dist[to_v] == float('inf'):
+            if dist[to_v] == float("inf"):
                 # これ以上流せない
                 return -1
 

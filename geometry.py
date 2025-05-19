@@ -308,7 +308,10 @@ class Line:
         return "y = {}x + {}".format(self.gradient, self.intercept)
 
     def __eq__(self, p):
-        return abs(self.gradient - p.gradient) < EPS and abs(self.intercept - p.intercept) < EPS
+        return (
+            abs(self.gradient - p.gradient) < EPS
+            and abs(self.intercept - p.intercept) < EPS
+        )
 
     @staticmethod
     def from_gradient(grad: float, intercept: float):
@@ -449,18 +452,24 @@ class Segment:
         """
         if self.is_parallel_to(s):
             # 並行なら線分の端点がもう片方の線分の上にあるかどうか
-            return (s.p1.on_segment(self.p1, self.p2, allow_side) or
-                    s.p2.on_segment(self.p1, self.p2, allow_side) or
-                    self.p1.on_segment(s.p1, s.p2, allow_side) or
-                    self.p2.on_segment(s.p1, s.p2, allow_side))
+            return (
+                s.p1.on_segment(self.p1, self.p2, allow_side)
+                or s.p2.on_segment(self.p1, self.p2, allow_side)
+                or self.p1.on_segment(s.p1, s.p2, allow_side)
+                or self.p2.on_segment(s.p1, s.p2, allow_side)
+            )
         else:
             # allow_side ならゼロを許容する
             det_upper = EPS if allow_side else -EPS
             ok = True
             # self の両側に s.p1 と s.p2 があるか
-            ok &= (self.p2 - self.p1).det(s.p1 - self.p1) * (self.p2 - self.p1).det(s.p2 - self.p1) < det_upper
+            ok &= (self.p2 - self.p1).det(s.p1 - self.p1) * (self.p2 - self.p1).det(
+                s.p2 - self.p1
+            ) < det_upper
             # s の両側に self.p1 と self.p2 があるか
-            ok &= (s.p2 - s.p1).det(self.p1 - s.p1) * (s.p2 - s.p1).det(self.p2 - s.p1) < det_upper
+            ok &= (s.p2 - s.p1).det(self.p1 - s.p1) * (s.p2 - s.p1).det(
+                self.p2 - s.p1
+            ) < det_upper
             return ok
 
     def closest_point(self, p):
@@ -533,9 +542,11 @@ class Polygon:
         隣り合う3点を順に返すイテレータ
         :rtype: typing.Iterator[(Point, Point, Point)]
         """
-        return zip(self.points,
-                   self.points[1:] + self.points[:1],
-                   self.points[2:] + self.points[:2])
+        return zip(
+            self.points,
+            self.points[1:] + self.points[:1],
+            self.points[2:] + self.points[:2],
+        )
 
     def area(self):
         """
@@ -570,7 +581,11 @@ class Polygon:
             if ccw == {Point.CCW_ONLINE_FRONT, Point.CCW_COUNTER_CLOCKWISE}:
                 return True
         if allow_collapsed and len(ccw) == 3:
-            return ccw == {Point.CCW_ONLINE_FRONT, Point.CCW_ONLINE_BACK, Point.CCW_ON_SEGMENT}
+            return ccw == {
+                Point.CCW_ONLINE_FRONT,
+                Point.CCW_ONLINE_BACK,
+                Point.CCW_ON_SEGMENT,
+            }
         return False
 
     def has_point_on_edge(self, p):
@@ -621,17 +636,22 @@ class Polygon:
         #: :type: list of (Point|None)
         ret = [None] * (len(points) * 2)
         for p in points:
-            while sz > 1 and (ret[sz - 1] - ret[sz - 2]).det(p - ret[sz - 1]) < det_lower:
+            while (
+                sz > 1 and (ret[sz - 1] - ret[sz - 2]).det(p - ret[sz - 1]) < det_lower
+            ):
                 sz -= 1
             ret[sz] = p
             sz += 1
         floor = sz
         for p in reversed(points[:-1]):
-            while sz > floor and (ret[sz - 1] - ret[sz - 2]).det(p - ret[sz - 1]) < det_lower:
+            while (
+                sz > floor
+                and (ret[sz - 1] - ret[sz - 2]).det(p - ret[sz - 1]) < det_lower
+            ):
                 sz -= 1
             ret[sz] = p
             sz += 1
-        ret = ret[:sz - 1]
+        ret = ret[: sz - 1]
 
         if allow_straight and len(ret) > len(points):
             # allow_straight かつ全部一直線のときに二重にカウントしちゃう
@@ -758,8 +778,8 @@ def closest_pair(points):
 
         # 分割統治
         # 両側の最近点対
-        ld, lp = _rec(xsorted[:n // 2])
-        rd, rp = _rec(xsorted[n // 2:])
+        ld, lp = _rec(xsorted[: n // 2])
+        rd, rp = _rec(xsorted[n // 2 :])
         if ld <= rd:
             d = ld
             ret_pair = lp
@@ -915,7 +935,7 @@ class Circle:
         """
         面積
         """
-        return self.r ** 2 * PI
+        return self.r**2 * PI
 
     def circular_segment_area(self, angle):
         """
@@ -925,7 +945,7 @@ class Circle:
         # 扇形の面積
         sector_area = self.area() * angle / TAU
         # 三角形部分を引く
-        return sector_area - self.r ** 2 * math.sin(angle) / 2
+        return sector_area - self.r**2 * math.sin(angle) / 2
 
     def intersection_points(self, other, allow_outer=False):
         """
@@ -959,7 +979,7 @@ class Circle:
             else:
                 return []
         # 足から左右に diff だけ動かした座標が答え
-        diff = Point.from_polar(math.sqrt(self.r ** 2 - dist ** 2), s.phase())
+        diff = Point.from_polar(math.sqrt(self.r**2 - dist**2), s.phase())
         ret1 = projection_point + diff
         ret2 = projection_point - diff
         ret = []
@@ -995,7 +1015,7 @@ class Circle:
         b = self.r
         c = self.o.dist(other.o)
         # 余弦定理で cos(a) を求めます
-        cos_a = (b ** 2 + c ** 2 - a ** 2) / (2 * b * c)
+        cos_a = (b**2 + c**2 - a**2) / (2 * b * c)
         angle = math.acos(cos_a)
         phi = (other.o - self.o).phase()
         return [
@@ -1018,11 +1038,11 @@ class Circle:
             # p が円周上にある
             return [Point(p.x, p.y)]
 
-        a = math.sqrt(dist ** 2 - self.r ** 2)
+        a = math.sqrt(dist**2 - self.r**2)
         b = self.r
         c = dist
         # 余弦定理で cos(a) を求めます
-        cos_a = (b ** 2 + c ** 2 - a ** 2) / (2 * b * c)
+        cos_a = (b**2 + c**2 - a**2) / (2 * b * c)
         angle = math.acos(cos_a)
         phi = (p - self.o).phase()
         return [
@@ -1038,7 +1058,7 @@ class Circle:
         """
         ctc = self.ctc(other)
         if ctc > 4:
-            raise ValueError('2つの円が同一です')
+            raise ValueError("2つの円が同一です")
         if ctc == 0:
             return []
         if ctc == 1:

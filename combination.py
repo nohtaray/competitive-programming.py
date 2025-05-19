@@ -73,7 +73,13 @@ class Combination:
         """
         if n < r:
             return 0
-        return self._factorials[n] * self._finvs[r] % self._mod * self._finvs[n - r] % self._mod
+        return (
+            self._factorials[n]
+            * self._finvs[r]
+            % self._mod
+            * self._finvs[n - r]
+            % self._mod
+        )
 
     def nhr(self, n, r):
         """
@@ -84,7 +90,7 @@ class Combination:
         return self.ncr(n + r - 1, r)
 
 
-if __name__ == '__main__':
-    assert Combination(5, 10 ** 9 + 7).ncr(5, 3) == 10
-    assert Combination(5, 10 ** 9 + 7).ncr(5, 1) == 5
+if __name__ == "__main__":
+    assert Combination(5, 10**9 + 7).ncr(5, 3) == 10
+    assert Combination(5, 10**9 + 7).ncr(5, 1) == 5
     assert Combination(5, 7).ncr(5, 3) == 3

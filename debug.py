@@ -23,15 +23,17 @@ def debug(fn):
         kwargs_cp = deepcopy(kwargs)
         ret = fn(*args, **kwargs)
         elapsed_ms = (time.perf_counter() - start_time) * 1000
-        print("DEBUG [{:4d} ms]: {}({}) -> {}".format(
-            int(elapsed_ms),
-            fn.__name__,
-            ", ".join(
-                list(map(str, args))
-                + ["{}={}".format(k, str(v)) for k, v in kwargs_cp.items()]
-            ),
-            ret
-        ))
+        print(
+            "DEBUG [{:4d} ms]: {}({}) -> {}".format(
+                int(elapsed_ms),
+                fn.__name__,
+                ", ".join(
+                    list(map(str, args))
+                    + ["{}={}".format(k, str(v)) for k, v in kwargs_cp.items()]
+                ),
+                ret,
+            )
+        )
         return ret
 
     return wrapper
@@ -42,7 +44,7 @@ def timer(name):
     st = time.perf_counter()
     yield
     t = int((time.perf_counter() - st) * 1000)
-    print(f'[{name}] {t:4d} ms', file=sys.stderr)
+    print(f"[{name}] {t:4d} ms", file=sys.stderr)
 
 
 def plot_figure(*figures):
@@ -61,15 +63,15 @@ def plot_figure(*figures):
         elif type(f).__name__ == geo.Segment.__name__:
             ax.plot((f.p1.x, f.p2.x), (f.p1.y, f.p2.y))
         elif type(f).__name__ == geo.Point.__name__:
-            ax.plot((f.x,), (f.y,), 'o')
+            ax.plot((f.x,), (f.y,), "o")
         elif isinstance(f, complex):
-            ax.plot((f.real,), (f.imag,), 'o')
+            ax.plot((f.real,), (f.imag,), "o")
         elif type(f).__name__ == geo.Line.__name__:
             raise NotImplementedError()
         else:
             raise NotImplementedError()
-    plt.axis('scaled')
-    ax.set_aspect('equal')
+    plt.axis("scaled")
+    ax.set_aspect("equal")
     plt.show()
 
 
@@ -82,9 +84,9 @@ def generate_undirected_graph(V, E, origin=1):
     :rtype: list of (int, int)
     """
     if E < V - 1:
-        raise ValueError('辺が少なすぎます')
+        raise ValueError("辺が少なすぎます")
     if E > V * (V - 1) // 2:
-        raise ValueError('辺が多すぎます')
+        raise ValueError("辺が多すぎます")
 
     #: :type: nx.Graph
     G = nx.random_tree(V)
@@ -92,7 +94,7 @@ def generate_undirected_graph(V, E, origin=1):
         # 存在しない辺を全部とってきてその中から選ぶ
         edges = list(nx.non_edges(G))
         random.shuffle(edges)
-        G.add_edges_from(edges[:E - V + 1])
+        G.add_edges_from(edges[: E - V + 1])
     else:
         # 辺を適当に生成して存在しなければ追加
         cnt = V - 1
@@ -133,9 +135,9 @@ def generate_directed_graph(V, E, origin=1):
     :rtype: list of (int, int)
     """
     if E < V - 1:
-        raise ValueError('辺が少なすぎます')
+        raise ValueError("辺が少なすぎます")
     if E > V * (V - 1):
-        raise ValueError('辺が多すぎます')
+        raise ValueError("辺が多すぎます")
 
     tree = []
     for v, u in nx.random_tree(V).edges():
@@ -148,7 +150,7 @@ def generate_directed_graph(V, E, origin=1):
         # 存在しない辺を全部とってきてその中から選ぶ
         edges = list(nx.non_edges(G))
         random.shuffle(edges)
-        G.add_edges_from(edges[:E - V + 1])
+        G.add_edges_from(edges[: E - V + 1])
     else:
         # 辺を適当に生成して存在しなければ追加
         cnt = V - 1
@@ -212,10 +214,11 @@ def plot_graph(edges, directed=False, v_offset=0):
         G.add_weighted_edges_from(edges)
         pos = nx.spring_layout(G)
         labels = nx.draw_networkx_edge_labels(
-            G, pos, edge_labels={(v, u): w for v, u, w in edges})
+            G, pos, edge_labels={(v, u): w for v, u, w in edges}
+        )
         for label in labels.values():
             # ラベルの傾きを修正
-            label.set_rotation('horizontal')
+            label.set_rotation("horizontal")
         nx.draw_networkx(G, pos, with_labels=True, alpha=0.5)
     else:
         G.add_edges_from(edges)

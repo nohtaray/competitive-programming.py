@@ -3,16 +3,19 @@ import itertools
 
 def get_factorials(max, mod=None):
     import libs.combination
+
     return libs.combination.get_factorials(max=max, mod=mod)
 
 
 def mod_invs(max, mod):
     import libs.combination
+
     return libs.combination.mod_invs(max=max, mod=mod)
 
 
 def factorial_invs(max, mod):
     import libs.combination
+
     return libs.combination.factorial_invs(max=max, mod=mod)
 
 
@@ -47,4 +50,4 @@ def get_montmort_numbers(max, mod):
     dp[1] = 0
     for i in range(2, len(dp)):
         dp[i] = (dp[i - 1] + dp[i - 2]) * (i - 1) % mod
-    return dp[:max + 1]
+    return dp[: max + 1]
