@@ -1,5 +1,4 @@
-import operator
-from functools import reduce
+from libs import fft
 
 
 def dump_matrix_bit(mat, width):
@@ -12,6 +11,13 @@ def dump_matrix_bit(mat, width):
 
     for row in mat:
         print(np.binary_repr(row, width=width))
+
+
+def poly_matrix_mul(m1, m2, mod, max_deg=None):
+    """
+    要素が多項式である行列の積
+    """
+    return fft.poly_matrix_mul(m1, m2, mod, max_deg)
 
 
 def matrix_mul_mod(m1, m2, mod):
@@ -49,42 +55,27 @@ def matrix_add_mod(m1, m2, mod):
     return ret
 
 
-def matrix_mul(m1, m2):
-    """
-    np.dot(m1, m2) と一緒
-    :param list of list m1:
-    :param list of list m2:
-    :rtype: list of list
-    """
-    rows = []
-    for r1 in range(len(m1)):
-        row = []
-        for c2 in range(len(m2[0])):
-            row.append(
-                reduce(operator.add, [m1[r1][r2] * m2[r2][c2] for r2 in range(len(m2))])
-            )
-        rows.append(row)
-    return rows
-
-
-def matrix_power(matrix, n, id_mat=None):
+def matrix_power_mod(matrix, n, mod):
     """
     numpy.linalg.matrix_power と一緒
     :param list of list matrix:
     :param int n:
-    :param list of list id_mat: 単位行列
+    :param int mod:
     :rtype: list of list
     """
     assert n >= 0
     if n == 0:
+        id_mat = [[0] * len(matrix) for _ in range(len(matrix))]
+        for i in range(len(matrix)):
+            id_mat[i][i] = 1
         return id_mat
 
     n -= 1
     ret = matrix  # 必要ならコピーする
     while n > 0:
         if n & 1:
-            ret = matrix_mul(ret, matrix)
-        matrix = matrix_mul(matrix, matrix)
+            ret = matrix_mul_mod(ret, matrix, mod)
+        matrix = matrix_mul_mod(matrix, matrix, mod)
         n >>= 1
     return ret
 
