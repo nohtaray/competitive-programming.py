@@ -17,6 +17,7 @@ def fft_int(A, B):
 
 
 # C++ 板
+# https://atcoder.jp/contests/typical90/submissions/66803088
 """
 ll inv_mod(ll a, ll mod) {
   ll res = 1, e = mod - 2;
@@ -28,13 +29,35 @@ ll inv_mod(ll a, ll mod) {
   return res;
 }
 
-vector<ll> poly_mul(const vector<ll>& a1, const vector<ll>& a2, ll mod, int max_deg=-1) {
+vector<vector<ll>> matrix_mul_mod(const vector<vector<ll>> &m1, const vector<vector<ll>> &m2, ll mod) {
+  int n = m1.size(), m = m2[0].size(), p = m2.size();
+  vector<vector<ll>> res(n, vector<ll>(m));
+  for (int i = 0; i < n; i++)
+    for (int j = 0; j < m; j++)
+      for (int k = 0; k < p; k++)
+        res[i][j] = (res[i][j] + m1[i][k] * m2[k][j]) % mod;
+  return res;
+}
+
+vector<vector<ll>> matrix_power_mod(vector<vector<ll>> matrix, ll n, ll mod) {
+  int sz = matrix.size();
+  vector<vector<ll>> res(sz, vector<ll>(sz));
+  for (int i = 0; i < sz; i++) res[i][i] = 1;
+  while (n > 0) {
+    if (n & 1) res = matrix_mul_mod(res, matrix, mod);
+    matrix = matrix_mul_mod(matrix, matrix, mod);
+    n >>= 1;
+  }
+  return res;
+}
+
+vector<ll> poly_mul(const vector<ll> &a1, const vector<ll> &a2, ll mod, ll max_deg = -1) {
   auto ret = convolution<MOD>(a1, a2);
-  if (max_deg != -1 && (int)ret.size() > max_deg + 1) ret.resize(max_deg + 1);
+  if (max_deg != -1 && (int) ret.size() > max_deg + 1) ret.resize(max_deg + 1);
   return ret;
 }
 
-vector<ll> poly_inv(const vector<ll>& f, int n, ll mod=MOD) {
+vector<ll> poly_inv(const vector<ll> &f, int n, ll mod = MOD) {
   if (f[0] % mod == 0) throw invalid_argument("f[0] must be invertible");
   ll f0_inv = inv_mod(f[0], mod);
   vector<ll> g = {f0_inv};
@@ -42,12 +65,12 @@ vector<ll> poly_inv(const vector<ll>& f, int n, ll mod=MOD) {
   while (k < n) {
     int next_k = min(2 * k, n);
     auto g_squared = poly_mul(g, g, mod, next_k);
-    vector<ll> f_part(f.begin(), f.begin() + min((int)f.size(), next_k));
+    vector<ll> f_part(f.begin(), f.begin() + min((int) f.size(), next_k));
     auto fg_squared = poly_mul(f_part, g_squared, mod, next_k);
     vector<ll> new_g(next_k);
-    for (int i = 0; i < (int)g.size() && i < next_k; i++)
+    for (int i = 0; i < (int) g.size() && i < next_k; i++)
       new_g[i] = 2 * g[i] % mod;
-    for (int i = 0; i < (int)fg_squared.size() && i < next_k; i++)
+    for (int i = 0; i < (int) fg_squared.size() && i < next_k; i++)
       new_g[i] = (new_g[i] - fg_squared[i] + mod) % mod;
     g = new_g;
     k = next_k;
@@ -56,7 +79,17 @@ vector<ll> poly_inv(const vector<ll>& f, int n, ll mod=MOD) {
   return g;
 }
 
-pair<vector<ll>, vector<ll>> poly_div(const vector<ll>& f, const vector<ll>& g, ll mod=MOD) {
+vector<ll> poly_add(const vector<ll> &a1, const vector<ll> &a2, ll mod) {
+  vector<ll> ret(max(a1.size(), a2.size()));
+  for (int i = 0; i < (int) a1.size(); i++) ret[i] = a1[i];
+  for (int i = 0; i < (int) a2.size(); i++) {
+    ret[i] += a2[i];
+    if (ret[i] >= mod) ret[i] -= mod;
+  }
+  return ret;
+}
+
+pair<vector<ll>, vector<ll>> poly_div(const vector<ll> &f, const vector<ll> &g, ll mod = MOD) {
   int deg_f = f.size() - 1;
   while (deg_f >= 0 && f[deg_f] == 0) deg_f--;
   int deg_g = g.size() - 1;
@@ -74,7 +107,7 @@ pair<vector<ll>, vector<ll>> poly_div(const vector<ll>& f, const vector<ll>& g, 
   while (!q.empty() && q.back() == 0) q.pop_back();
   auto gq = poly_mul(g, q, mod);
   vector<ll> r = f;
-  for (int i = 0; i < (int)gq.size() && i < (int)r.size(); i++)
+  for (int i = 0; i < (int) gq.size() && i < (int) r.size(); i++)
     r[i] = (r[i] - gq[i] + mod) % mod;
   while (!r.empty() && r.back() == 0) r.pop_back();
   return {q, r};
