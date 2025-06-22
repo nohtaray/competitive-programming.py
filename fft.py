@@ -3,7 +3,7 @@ import numpy as np
 from scipy import signal
 
 
-# MOD を取る場合はこれを使う
+# PyPy のときはこれを使う
 # https://github.com/shakayami/ACL-for-python/blob/master/convolution.py
 # https://atcoder.jp/contests/practice2/submissions/61290539
 
@@ -13,7 +13,47 @@ def fft(A, B):
 
 
 def fft_int(A, B):
-    return np.rint(fft(A, B)).astype(int)
+    return np.rint(fft(A, B)).astype(np.int64)
+
+
+def fft_mod(f, g, mod):
+    """
+    畳み込み
+    係数および法は 2^30-2 程度まで
+    NTT 素数でなくてもいい
+    """
+    f = np.asarray(f, dtype=np.int64)
+    g = np.asarray(g, dtype=np.int64)
+    N = len(f) + len(g) - 1
+
+    MASK = (1 << 10) - 1
+    # 10 bit ごとに切り出し
+    f0, f1, f2 = f & MASK, (f >> 10) & MASK, f >> 20
+    g0, g1, g2 = g & MASK, (g >> 10) & MASK, g >> 20
+
+    # -------- FFT 畳み込み (6 回) --------
+    fft = lambda a, b: np.rint(signal.fftconvolve(a, b)[:N]).astype(np.int64)
+    p00 = fft(f0, g0) % mod  # f0 g0
+    p11 = fft(f1, g1) % mod  # f1 g1
+    p22 = fft(f2, g2) % mod  # f2 g2
+    p01 = fft(f0 + f1, g0 + g1) % mod
+    p02 = fft(f0 + f2, g0 + g2) % mod
+    p12 = fft(f1 + f2, g1 + g2) % mod
+
+    # -------- 合成 (c0 ... c4) --------
+    c0 = p00
+    c1 = (p01 - p00 - p11) % mod  # f0*g1 + f1*g0
+    c2 = (p02 - p00 - p22 + p11) % mod  # f0*g2 + f1*g1 + f2*g0
+    c3 = (p12 - p11 - p22) % mod  # f1*g2 + f2*g1
+    c4 = p22  # f2*g2
+
+    # -------- 桁上げ (基数 2^10) --------
+    B1 = (1 << 10) % mod
+    B2 = (1 << 20) % mod
+    B3 = (1 << 30) % mod
+    B4 = (1 << 40) % mod
+    res = (c0 + c1 * B1 + c2 * B2 + c3 * B3 + c4 * B4) % mod
+    return res.astype(np.int64)
 
 
 # C++ 板
@@ -125,7 +165,8 @@ def poly_mul(a1, a2, mod, max_deg=None):
     :param int|None max_deg: 最大次数
     :rtype: list of int
     """
-    ret = atcoder.convolution.convolution(mod, a1, a2)
+    # ret = atcoder.convolution.convolution(mod, a1, a2)
+    ret = fft_mod(a1, a2, mod)
     if max_deg is not None:
         return ret[: max_deg + 1]
     return ret
