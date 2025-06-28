@@ -104,33 +104,50 @@ def mod_inv(a, mod):
     return x % mod
 
 
-def get_primes(max=None, count=None):
+def get_primes(end: int):
     """
-    素数列挙
+    end 未満の素数を列挙する
     昇順にソートされています
     https://qiita.com/Ishotihadus/items/73e107271275611f05f2
-    :param int max:
-    :param int count:
+    :param int end:
     """
-    assert max is not None or count is not None
-    if count:
-        raise NotImplementedError()
-    if max <= 1:
+    if end <= 1:
         return []
-
     primes = [2]
-    sieve = [False for _ in range(max + 1)]
+    sieve = [False for _ in range(end + 1)]
     p = 3
-    while p <= max:
+    while p <= end:
         primes.append(p)
         sieve[p] = True
-        if p <= math.sqrt(max):
-            for i in range(p * (p | 1), max + 1, p * 2):
+        if p <= math.sqrt(end):
+            for i in range(p * (p | 1), end + 1, p * 2):
                 sieve[i] = True
-        while p <= max and sieve[p]:
+        while p <= end and sieve[p]:
             p += 2
-
     return primes
+
+
+def get_primes_range(L: int, R: int):
+    """
+    L 以上 R 未満の素数を列挙する
+    O(sqrt(R) + (R-L) log log R)
+    """
+    L = max(L, 2)
+    if R < L:
+        return []
+    primes = get_primes(math.isqrt(R) + 10)
+    sieve = [False for _ in range(R - L)]
+    for p in primes:
+        si = -L % p
+        if L + si == p:
+            si += p
+        for i in range(si, len(sieve), p):
+            sieve[i] = True
+    ret = []
+    for i in range(len(sieve)):
+        if not sieve[i]:
+            ret.append(L + i)
+    return ret
 
 
 def pow_pow(a, b, c, mod):
