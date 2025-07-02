@@ -386,6 +386,16 @@ class LazySegmentTreeAddSum:
 # st = atcoder.lazysegtree.LazySegTree(op, e, mapping, composition, id, values)
 
 
+## 区間和、区間 update
+# op = lambda a, b: (a[0] + b[0], a[1] + b[1])
+# e = 0, 0
+# mapping = lambda f, s: s if f is None else (f * s[1], s[1])
+# composition = lambda f, g: g if f is None else f
+# id = None
+# values = [(0, 1)] * ...  # [(value, 1), (value, 1), ...]
+# st = atcoder.lazysegtree.LazySegTree(op, e, mapping, composition, id, values)
+
+
 # ac-library
 # atcoder.lazysegtree.LazySegTree(...)
 # https://betrue12.hateblo.jp/entry/2020/09/23/005940
