@@ -32,7 +32,6 @@ import atcoder.segtree
 import atcoder.string
 import atcoder.twosat
 import numpy as np
-from sortedcontainers import SortedList, SortedSet, SortedKeyList, SortedDict
 
 if os.getenv("LOCAL"):
     sys.stdin = open("_in.txt", "r")

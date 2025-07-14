@@ -345,6 +345,12 @@ class LazySegmentTreeAddSum:
 
 
 ## ac-library
+## op(x, y): x ⋅ y
+## mapping(f, x): f(x)
+## composition(f, g): f ∘ g
+## e: 単位元
+## id: 恒等写像
+
 ## 区間 max、区間 chmax
 ## https://atcoder.jp/contests/abc382/submissions/61522085
 # op = max
@@ -396,8 +402,28 @@ class LazySegmentTreeAddSum:
 # st = atcoder.lazysegtree.LazySegTree(op, e, mapping, composition, id, values)
 
 
+## 区間和・区間行列積
+## https://atcoder.jp/contests/abc288/submissions/67592390
+# # (0,1,2,3) = 左上、右上、左下、右下
+# op = lambda x, y: ((x[0] + y[0]) % MOD, (x[1] + y[1]) % MOD)
+# e = (0, 0)
+# mapping = lambda f, s: (
+#     (f[0] * s[0] + f[1] * s[1]) % MOD,
+#     (f[2] * s[0] + f[3] * s[1]) % MOD,
+# )
+# composition = lambda f, g: (
+#     (f[0] * g[0] + f[1] * g[2]) % MOD,
+#     (f[2] * g[0] + f[3] * g[2]) % MOD,
+#     (f[0] * g[1] + f[1] * g[3]) % MOD,
+#     (f[2] * g[1] + f[3] * g[3]) % MOD,
+# )
+# id = (1, 0, 0, 1)
+# values = [...]
+# st = atcoder.lazysegtree.LazySegTree(op, e, mapping, composition, id, values)
+
+
 # ac-library
-# atcoder.lazysegtree.LazySegTree(...)
+# そのほか
 # https://betrue12.hateblo.jp/entry/2020/09/23/005940
 
 
