@@ -148,6 +148,8 @@ def euler_tour_inout(tree, max_v, root=0):
 
 def topological_sort(graph):
     """
+    トポロジカルソート
+    有効な順序のうち辞書順最小のものを返す
     :param list of (list of int) graph:
     """
     # 入次数
@@ -164,13 +166,15 @@ def topological_sort(graph):
 
     # 入次数がゼロのやつから順に追加してく
     ret = []
+    heapq.heapify(zeros)
     while zeros:
-        v = zeros.pop()
+        # zeros の要素ならどれでもいいが辞書順最小になるように heapq を使う
+        v = heapq.heappop(zeros)
         ret.append(v)
         for u in graph[v]:
             ins[u] -= 1
             if ins[u] == 0:
-                zeros.append(u)
+                heapq.heappush(zeros, u)
 
     if len(ret) != len(graph):
         raise ValueError("閉路があります")
