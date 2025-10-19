@@ -71,6 +71,8 @@ class Combination:
         :param int r:
         :rtype: int
         """
+        if r < 0:
+            return 0
         if n < r:
             return 0
         return (

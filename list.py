@@ -55,6 +55,29 @@ def cumsum2(arr):
     return ret
 
 
+def cumsum3(arr):
+    """
+    3次元累積和
+    cum[rx][ry][rz] - cum[lx][ry][rz] - cum[rx][ly][rz] - cum[rx][ry][lz] + cum[lx][ly][rz] + cum[lx][ry][lz] + cum[rx][ly][lz] - cum[lx][ly][lz]
+    """
+    X = len(arr)
+    Y = len(arr[0])
+    Z = len(arr[0][0])
+    ret = [[[0] * (X + 1) for _ in range(Y + 1)] for _ in range(Z + 1)]
+    for x, y, z in itertools.product(range(X), range(Y), range(Z)):
+        ret[x + 1][y + 1][z + 1] = (
+            ret[x][y + 1][z + 1]
+            + ret[x + 1][y][z + 1]
+            + ret[x + 1][y + 1][z]
+            - ret[x][y][z + 1]
+            - ret[x][y + 1][z]
+            - ret[x + 1][y][z]
+            + ret[x][y][z]
+            + arr[x][y][z]
+        )
+    return ret
+
+
 def cummax2(arr):
     H = len(arr)
     W = len(arr[0])
