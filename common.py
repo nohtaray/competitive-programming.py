@@ -36,6 +36,7 @@ import numpy as np
 if os.getenv("LOCAL"):
     sys.stdin = open("_in.txt", "r")
 
+sys.set_int_max_str_digits(0)
 sys.setrecursionlimit(10**9)
 INF = float("inf")
 IINF = 10**18
